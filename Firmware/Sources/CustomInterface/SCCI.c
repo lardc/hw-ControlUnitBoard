@@ -810,13 +810,17 @@ static void SCCI_HandleCall(pSCCI_Interface Interface)
 	}
 	else
 	{
-		if(node == SM_TOU_NODE_ID && SM_IsTOUSwitchAction(action) && SM_IsCUHV2Connected())
+		// Блокировка запуска TOU
+		if(SM_IsCUHV2Connected() && (node == SM_TOU_NODE_ID) &&
+				SM_IsTOUSwitchAction(action) && PROTECT_TOU)
 		{
 			SCCI_SendErrorFrameEx(Interface, node, ERR_BLOCKED, action);
 			return;
 		}
 
-		if(node == SM_CUHV2_NODE_ID && SM_IsCUHV2SwitchAction(action) && SM_IsTOUConnected())
+		// Блокировка запуска CUHV2
+		if(node == SM_CUHV2_NODE_ID && SM_IsCUHV2SwitchAction(action) &&
+				SM_IsTOUConnected() && PROTECT_TOU)
 		{
 			SCCI_SendErrorFrameEx(Interface, node, ERR_BLOCKED, action);
 			return;

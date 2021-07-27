@@ -9,6 +9,11 @@
 //
 #define SM_CUHV2_NODE_ID			1
 #define SM_TOU_NODE_ID				11
+#define SM_QRR_NODE_ID				10
+
+// Protection parameters
+#define PROTECT_TOU					FALSE
+#define PROTECT_QRR					TRUE
 
 // Functions
 //
