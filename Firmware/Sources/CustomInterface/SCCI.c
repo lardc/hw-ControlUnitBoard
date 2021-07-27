@@ -811,16 +811,13 @@ static void SCCI_HandleCall(pSCCI_Interface Interface)
 	else
 	{
 		// Блокировка запуска TOU
-		if(SM_IsCUHV2Connected() && (node == SM_TOU_NODE_ID) &&
-				SM_IsTOUSwitchAction(action) && PROTECT_TOU)
-		{
-			SCCI_SendErrorFrameEx(Interface, node, ERR_BLOCKED, action);
-			return;
-		}
+		Boolean BlockTOU = PROTECT_TOU && (node == SM_TOU_NODE_ID) && SM_IsTOUSwitchAction(action) && SM_IsCUHV2Connected();
+		Boolean BlockQrr = PROTECT_QRR && (node == SM_QRR_NODE_ID) && SM_IsQrrSwitchAction(action) && SM_IsCUHV2Connected();
 
-		// Блокировка запуска CUHV2
-		if(node == SM_CUHV2_NODE_ID && SM_IsCUHV2SwitchAction(action) &&
-				SM_IsTOUConnected() && PROTECT_TOU)
+		Boolean BlockCUHV2 = (node == SM_CUHV2_NODE_ID) && SM_IsCUHV2SwitchAction(action) &&
+				((PROTECT_TOU && SM_IsTOUConnected()) || (PROTECT_QRR && SM_IsQrrConnected()));
+
+		if(BlockTOU || BlockQrr || BlockCUHV2)
 		{
 			SCCI_SendErrorFrameEx(Interface, node, ERR_BLOCKED, action);
 			return;
@@ -831,6 +828,9 @@ static void SCCI_HandleCall(pSCCI_Interface Interface)
 
 		if(node == SM_TOU_NODE_ID)
 			SM_ProcessTOUCommand(action);
+
+		if(node == SM_QRR_NODE_ID)
+			SM_ProcessQrrCommand(action);
 
 		BCCIM_SetActiveSCCI(Interface);
 		BCCIM_Call(&DEVICE_CAN_Interface, node, action);

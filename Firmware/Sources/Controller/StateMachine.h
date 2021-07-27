@@ -28,4 +28,9 @@ Boolean SM_IsTOUSwitchAction(Int16U Command);
 void SM_ProcessTOUCommand(Int16U Command);
 void SM_ProcessTOURegisterRead(Int16U Register, Int16U Data);
 
+Boolean SM_IsQrrConnected();
+Boolean SM_IsQrrSwitchAction(Int16U Command);
+void SM_ProcessQrrCommand(Int16U Command);
+void SM_ProcessQrrRegisterRead(Int16U Register, Int16U Data);
+
 #endif // __STATE_MACHINE_H

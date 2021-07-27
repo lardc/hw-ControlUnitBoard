@@ -3,12 +3,23 @@
 
 // Definitions
 //
+// TOU section
 #define SM_TOU_ACT_MEASURE_START	100
 //
 #define SM_TOU_STATE_REGISTER		192
 #define SM_TOU_STATE_IN_PROCESS		4
 //
-#define SM_OPRES_REGISTER			197
+#define SM_TOU_OPRES_REGISTER		197
+
+// Qrr section
+#define SM_QRR_ACT_START			100
+#define SM_QRR_ACT_SINGLE_START		102
+//
+#define SM_QRR_STATE_REGISTER		192
+#define SM_QRR_STATE_IN_PROCESS		5
+//
+#define SM_QRR_OPRES_REGISTER		198
+
 #define SM_OPRES_UNDEFINED			0
 
 // Types
@@ -34,7 +45,7 @@ typedef enum __CUHV2Command
 
 // Variables
 //
-static Boolean CUHV2Connected = TRUE, TOUConnected = FALSE;
+static Boolean CUHV2Connected = TRUE, TOUConnected = FALSE, QrrConnected = FALSE;
 
 // Functions
 //
@@ -42,6 +53,7 @@ void SM_Reset()
 {
 	CUHV2Connected = TRUE;
 	TOUConnected = FALSE;
+	QrrConnected = FALSE;
 }
 // ----------------------------------------
 
@@ -119,9 +131,38 @@ void SM_ProcessTOUCommand(Int16U Command)
 void SM_ProcessTOURegisterRead(Int16U Register, Int16U Data)
 {
 	if((Register == SM_TOU_STATE_REGISTER) && (Data != SM_TOU_STATE_IN_PROCESS) ||
-		(Register == SM_OPRES_REGISTER) && (Data != SM_OPRES_UNDEFINED))
+		(Register == SM_TOU_OPRES_REGISTER) && (Data != SM_OPRES_UNDEFINED))
 	{
 		TOUConnected = FALSE;
+	}
+}
+// ----------------------------------------
+
+Boolean SM_IsQrrConnected()
+{
+	return QrrConnected;
+}
+// ----------------------------------------
+
+Boolean SM_IsQrrSwitchAction(Int16U Command)
+{
+	return (Command == SM_QRR_ACT_START) || (Command == SM_QRR_ACT_SINGLE_START);
+}
+// ----------------------------------------
+
+void SM_ProcessQrrCommand(Int16U Command)
+{
+	if((Command == SM_QRR_ACT_START) || (Command == SM_QRR_ACT_SINGLE_START))
+		QrrConnected = TRUE;
+}
+// ----------------------------------------
+
+void SM_ProcessQrrRegisterRead(Int16U Register, Int16U Data)
+{
+	if((Register == SM_QRR_STATE_REGISTER) && (Data != SM_QRR_STATE_IN_PROCESS) ||
+		(Register == SM_QRR_OPRES_REGISTER) && (Data != SM_OPRES_UNDEFINED))
+	{
+		QrrConnected = FALSE;
 	}
 }
 // ----------------------------------------
