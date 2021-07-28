@@ -823,14 +823,23 @@ static void SCCI_HandleCall(pSCCI_Interface Interface)
 			return;
 		}
 
-		if(node == SM_CUHV2_NODE_ID)
-			SM_ProcessCUHV2Command(action);
+		switch(node)
+		{
+			case SM_CUHV2_NODE_ID:
+				SM_ProcessCUHV2Command(action);
+				break;
 
-		if(node == SM_TOU_NODE_ID)
-			SM_ProcessTOUCommand(action);
+			case SM_TOU_NODE_ID:
+				SM_ProcessTOUCommand(action);
+				break;
 
-		if(node == SM_QRR_NODE_ID)
-			SM_ProcessQrrCommand(action);
+			case SM_QRR_NODE_ID:
+				SM_ProcessQrrCommand(action);
+				break;
+
+			default:
+				break;
+		}
 
 		BCCIM_SetActiveSCCI(Interface);
 		BCCIM_Call(&DEVICE_CAN_Interface, node, action);
