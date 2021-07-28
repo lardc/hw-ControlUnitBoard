@@ -237,8 +237,19 @@ static void BCCIM_HandleRead16(pBCCIM_Interface Interface)
 	data = CANInput.HIGH.WORD.WORD_1;
 	node = CANInput.MsgID.all >> 10;
 	
-	if(node == SM_TOU_NODE_ID)
-		SM_ProcessTOURegisterRead(addr, data);
+	switch(node)
+	{
+		case SM_TOU_NODE_ID:
+			SM_ProcessTOURegisterRead(addr, data);
+			break;
+
+		case SM_QRR_NODE_ID:
+			SM_ProcessQrrRegisterRead(addr, data);
+			break;
+
+		default:
+			break;
+	}
 
 	SCCI_AnswerRead16(ActiveSCCI, node, addr, data);
 }
