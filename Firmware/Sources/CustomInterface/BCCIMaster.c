@@ -239,6 +239,10 @@ static void BCCIM_HandleRead16(pBCCIM_Interface Interface)
 	
 	switch(node)
 	{
+		case SM_CUHV2_NODE_ID:
+			SM_ProcessCUHV2RegisterRead(addr, data);
+			break;
+
 		case SM_TOU_NODE_ID:
 			SM_ProcessTOURegisterRead(addr, data);
 			break;

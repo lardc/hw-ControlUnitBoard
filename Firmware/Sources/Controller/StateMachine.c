@@ -3,6 +3,12 @@
 
 // Definitions
 //
+// CUHV2 section
+#define SM_CUHV2_STATE_REGISTER		96
+//
+#define SM_CUHV2_STATE_ENABLED		3
+#define SM_CUHV2_STATE_SAFETY_ACT	4
+
 // TOU section
 #define SM_TOU_ACT_MEASURE_START	100
 //
@@ -29,6 +35,9 @@ typedef enum __CUHV2Command
 	CUHV2_EnablePower = 1,
 	CUHV2_DisablePower = 2,
 	CUHV2_ClearFault = 3,
+
+	CUHV2_SafetyActive = 100,
+	CUHV2_SafetyInActive = 101,
 
 	CUHV2_CommNone = 110,
 	CUHV2_CommGate = 111,
@@ -105,6 +114,17 @@ void SM_ProcessCUHV2Command(Int16U Command)
 		case CUHV2_CommNoPE:
 			CUHV2Connected = FALSE;
 			break;
+	}
+}
+// ----------------------------------------
+
+void SM_ProcessCUHV2RegisterRead(Int16U Register, Int16U Data)
+{
+	if((Register == SM_CUHV2_STATE_REGISTER) && \
+		(Data != SM_CUHV2_STATE_ENABLED) && (Data != SM_CUHV2_STATE_SAFETY_ACT))
+	{
+		TOUConnected = QrrConnected = FALSE;
+		CUHV2Connected = TRUE;
 	}
 }
 // ----------------------------------------

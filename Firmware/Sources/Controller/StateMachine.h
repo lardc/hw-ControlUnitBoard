@@ -23,6 +23,8 @@ Boolean SM_IsCUHV2Connected();
 Boolean SM_IsCUHV2SwitchAction(Int16U Command);
 void SM_ProcessCUHV2Command(Int16U Command);
 
+void SM_ProcessCUHV2RegisterRead(Int16U Register, Int16U Data);
+
 Boolean SM_IsTOUConnected();
 Boolean SM_IsTOUSwitchAction(Int16U Command);
 void SM_ProcessTOUCommand(Int16U Command);
