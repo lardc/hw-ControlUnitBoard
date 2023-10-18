@@ -41,7 +41,6 @@ static BCCI_IOConfig CAN_IOConfig;
 static xCCI_ServiceConfig X_ServiceConfig;
 static xCCI_FUNC_CallbackAction ControllerDispatchFunction;
 static EPStates RS232_EPState;
-static EPStates RS485_EPState;
 static Boolean UnlockedForNVWrite = FALSE;
 //
 static volatile Boolean *MaskChangesFlag;
@@ -103,11 +102,6 @@ void DEVPROFILE_InitEPService(pInt16U Indexes, pInt16U Sizes, pInt16U *Counters,
 		RS232_EPState.EPs[i].Data = Datas[i];
 		RS232_EPState.EPs[i].ReadCounter = RS232_EPState.EPs[i].LastReadCounter = 0;
 		
-		RS485_EPState.EPs[i].Size = Sizes[i];
-		RS485_EPState.EPs[i].pDataCounter = Counters[i];
-		RS485_EPState.EPs[i].Data = Datas[i];
-		RS485_EPState.EPs[i].ReadCounter = RS485_EPState.EPs[i].LastReadCounter = 0;
-		
 		SCCI_RegisterReadEndpoint16(&DEVICE_RS232_Interface, Indexes[i], &DEVPROFILE_CallbackReadX);
 	}
 }
@@ -132,9 +126,6 @@ void DEVPROFILE_ResetEPReadState()
 	{
 		RS232_EPState.EPs[i].ReadCounter = 0;
 		RS232_EPState.EPs[i].LastReadCounter = 0;
-		
-		RS485_EPState.EPs[i].ReadCounter = 0;
-		RS485_EPState.EPs[i].LastReadCounter = 0;
 	}
 }
 // ----------------------------------------
@@ -153,9 +144,6 @@ void DEVPROFILE_ResetScopes(Int16U ResetPosition)
 	{
 		*(RS232_EPState.EPs[i].pDataCounter) = ResetPosition;
 		MemZero16(RS232_EPState.EPs[i].Data, RS232_EPState.EPs[i].Size);
-		
-		*(RS485_EPState.EPs[i].pDataCounter) = ResetPosition;
-		MemZero16(RS485_EPState.EPs[i].Data, RS485_EPState.EPs[i].Size);
 	}
 }
 // ----------------------------------------
