@@ -44,7 +44,7 @@ void CONTROL_Init(Boolean BadClockDetected)
 	pInt16U EPCounters[EP_COUNT] = {(pInt16U)&CONTROL_Values_1_Counter};
 	pInt16U EPDatas[EP_COUNT] = {CONTROL_Values_1};
 	// Data-table EPROM service configuration
-	EPROMServiceConfig EPROMService = {NULL, NULL};
+	EPROMServiceConfig EPROMService = { &ZbMemory_WriteValuesEPROM, &ZbMemory_ReadValuesEPROM };
 	
 	// Init data table
 	DT_Init(EPROMService, BadClockDetected);

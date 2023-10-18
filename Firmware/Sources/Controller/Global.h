@@ -10,12 +10,7 @@
 
 // Global parameters
 //--------------------------------------------------------
-// Password to unlock non-volatile area for write
 #define ENABLE_LOCKING					FALSE
-#define UNLOCK_PWD_1					1
-#define UNLOCK_PWD_2					1
-#define UNLOCK_PWD_3					1
-#define UNLOCK_PWD_4					1
 //
 #define MME_CODE						0
 #undef MME_PROTECTED_CALL

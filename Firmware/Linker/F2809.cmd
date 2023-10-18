@@ -112,7 +112,23 @@ PAGE 1 :   /* Data Memory */
  
 SECTIONS
 {
- 
+Flash28_API:
+   {
+        -lFlash2809_API_V100.lib(.econst)
+        -lFlash2809_API_V100.lib(.text)
+   }                   LOAD = FLASHD,
+                       RUN = RAML0L10,
+                       /* В переменную Flash28_API_LoadStart зап-ем нач. адр.
+                          сектора  Flash28_API */
+                       LOAD_START(_Flash28_API_LoadStart),
+                       /* В переменную Flash28_API_LoadEnd записываем кон. адр.
+                          сектора  Flash28_API */
+                       LOAD_END(_Flash28_API_LoadEnd),
+                       /* В переменную Flash28_API_RunStart записываем адр.
+                          для записи API functions в RAM */
+                       RUN_START(_Flash28_API_RunStart),
+                       PAGE = 0
+
    /* Allocate program areas: */
    .cinit              : > FLASHC      PAGE = 0
    .pinit              : > FLASHC      PAGE = 0
@@ -135,7 +151,7 @@ SECTIONS
 
    /* Initalized sections go in Flash */
    /* For SDFlash to program these, they must be allocated to page 0 */
-   .econst             : > FLASHC      PAGE = 0
+   .econst             : > FLASHD      PAGE = 0
    .switch             : > FLASHC      PAGE = 0
 
    /* Allocate IQ math areas: */

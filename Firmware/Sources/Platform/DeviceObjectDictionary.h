@@ -9,6 +9,10 @@
 //
 #define ACT_RESET_STATE_MACHINE		10	// Reset state machine to default state
 //
+#define ACT_SAVE_TO_ROM				200	// Save parameters to EEPROM module
+#define ACT_RESTORE_FROM_ROM		201	// Restore parameters from EEPROM module
+#define ACT_RESET_TO_DEFAULT		202	// Reset parameters to default values (only in controller memory)
+//
 #define ACT_BOOT_LOADER_REQUEST		320	// Request reboot to bootloader
 //
 #define REG_LAMP_1					128	//
@@ -76,6 +80,7 @@
 // USER ERROR CODES
 //
 #define ERR_NONE					0	// No error
+#define ERR_WRONG_PWD				4	// Wrong password - unlock failed
 
 
 #endif // __DEV_OBJ_DIC_H

@@ -11,6 +11,7 @@
 //
 #include "ZbGPIO.h"
 #include "ZbWatchDog.h"
+#include "ZbMemory.h"
 
 
 #endif // __ZB_BOARD_H

@@ -15,6 +15,7 @@
 #include "DataTable.h"
 #include "DeviceProfile.h"
 #include "Global.h"
+#include "Flash.h"
 
 
 // FORWARD FUNCTIONS
@@ -64,6 +65,7 @@ void main()
 
 	// Try initialize SCI in spite of result of clock initialization
 	InitializeSCI();
+	FLASH_Init();
 
 	// Setup ISRs
 	BEGIN_ISR_MAP
