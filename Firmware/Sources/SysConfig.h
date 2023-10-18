@@ -69,20 +69,11 @@
 
 // CAN-A
 //--------------------------------------------------------
-
-//#define CANA_BR				100000L
-//#define CANA_BRP			124
-//#define CANA_TSEG1			3
-//#define CANA_TSEG2			2
-//#define CANA_SJW			1
-
-
 #define CANA_BR				1000000L
 #define CANA_BRP			9
 #define CANA_TSEG1			6
 #define CANA_TSEG2			1
 #define CANA_SJW			1
-
 //--------------------------------------------------------
 
 #endif // __SYSCONFIG_H
