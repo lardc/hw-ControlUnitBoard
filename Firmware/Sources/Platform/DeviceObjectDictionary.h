@@ -5,7 +5,7 @@
 #ifndef __DEV_OBJ_DIC_H
 #define __DEV_OBJ_DIC_H
 
-// REGISTERS
+// COMMANDS
 //
 #define ACT_RESET_STATE_MACHINE		10	// Reset state machine to default state
 //
@@ -14,6 +14,11 @@
 #define ACT_RESET_TO_DEFAULT		202	// Reset parameters to default values (only in controller memory)
 //
 #define ACT_BOOT_LOADER_REQUEST		320	// Request reboot to bootloader
+
+
+// REGISTERS
+//
+#define REG_PCB1_1					0	// Выбор версии 1.1 для ПП
 //
 #define REG_LAMP_1					128	//
 #define REG_LAMP_2					129	//
