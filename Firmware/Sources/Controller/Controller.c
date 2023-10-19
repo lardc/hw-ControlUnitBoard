@@ -56,7 +56,7 @@ void CONTROL_Init()
 	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
 	// Reset control values
 	DEVPROFILE_ResetControlSection();
-	DataTable[REG_MME_CODE] = MME_CODE;
+	DataTable[REG_MME_CODE] = DataTable[REG_MME_CODE_CONFIG];
 	
 	if(ZwSystem_GetDogAlarmFlag())
 		ZwSystem_ClearDogAlarmFlag();

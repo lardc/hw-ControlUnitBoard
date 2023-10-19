@@ -18,7 +18,8 @@
 
 // REGISTERS
 //
-#define REG_PCB1_1					0	// Выбор версии 1.1 для ПП
+#define REG_MME_CODE_CONFIG			0	// Регистр сохранения кода комплекса
+#define REG_PCB1_1					1	// Выбор версии 1.1 для ПП
 //
 #define REG_LAMP_1					128	//
 #define REG_LAMP_2					129	//

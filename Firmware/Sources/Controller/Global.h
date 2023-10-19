@@ -11,8 +11,6 @@
 // Global parameters
 //--------------------------------------------------------
 #define ENABLE_LOCKING					FALSE
-//
-#define MME_CODE						0
 #undef MME_PROTECTED_CALL
 //
 #define	SCCI_TIMEOUT_TICKS				1000
