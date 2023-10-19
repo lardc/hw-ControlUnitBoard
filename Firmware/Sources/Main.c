@@ -193,14 +193,13 @@ ISRCALL Timer2_ISR(void)
 	ZbGPIO_SwitchLamp2(DataTable[REG_LAMP_2]);
 
 	ZbGPIO_ReadSensors();
-	DataTable[REG_SENSOR_1] = (PATCH_INVERT_SEN0_INPUT ? !Sensor1 : Sensor1) ? 1 : 0;
-	DataTable[REG_SENSOR_2] = (PATCH_INVERT_SEN1_INPUT ? !Sensor2 : Sensor2) ? 1 : 0;
-	DataTable[REG_SENSOR_3] = Sensor3 ? 1 : 0;
-	DataTable[REG_SENSOR_4] = Sensor4 ? 1 : 0;
+	DataTable[REG_SENSOR_1] = (DataTable[REG_INVERT_SEN1] ? !Sensor1 : Sensor1) ? 1 : 0;
+	DataTable[REG_SENSOR_2] = (DataTable[REG_INVERT_SEN2] ? !Sensor2 : Sensor2) ? 1 : 0;
+	DataTable[REG_SENSOR_3] = (DataTable[REG_INVERT_SEN3] ? !Sensor3 : Sensor3) ? 1 : 0;
+	DataTable[REG_SENSOR_4] = (DataTable[REG_INVERT_SEN4] ? !Sensor4 : Sensor4) ? 1 : 0;
 
-#if (PATCH_STOP_BUTTON_DISABLE == TRUE)
-	DataTable[REG_SENSOR_4] = 0;
-#endif
+	if(DataTable[REG_DISABLE_SEN4])
+		DataTable[REG_SENSOR_4] = 0;
 
 	// no PIE
 	TIMER2_ISR_DONE;

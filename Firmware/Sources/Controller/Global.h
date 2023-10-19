@@ -18,11 +18,4 @@
 #define VALUES_x_SIZE					16
 //--------------------------------------------------------
 
-// Custom parameters
-//--------------------------------------------------------
-#define PATCH_STOP_BUTTON_DISABLE		TRUE
-#define PATCH_INVERT_SEN0_INPUT			TRUE
-#define PATCH_INVERT_SEN1_INPUT			TRUE
-//--------------------------------------------------------
-
 #endif // __GLOBAL_H

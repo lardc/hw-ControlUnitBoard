@@ -20,6 +20,11 @@
 //
 #define REG_MME_CODE_CONFIG			0	// Регистр сохранения кода комплекса
 #define REG_PCB1_1					1	// Выбор версии 1.1 для ПП
+#define REG_INVERT_SEN1				2	// Инверсия сигнала с датчика 1
+#define REG_INVERT_SEN2				3	// Инверсия сигнала с датчика 2
+#define REG_INVERT_SEN3				4	// Инверсия сигнала с датчика 3
+#define REG_INVERT_SEN4				5	// Инверсия сигнала с датчика 4
+#define REG_DISABLE_SEN4			6	// Отключение датчика 4
 //
 #define REG_LAMP_1					128	//
 #define REG_LAMP_2					129	//
