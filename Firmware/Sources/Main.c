@@ -228,14 +228,8 @@ ISRCALL Timer0_ISR(void)
 
 ISRCALL Timer2_ISR(void)
 {
-	if (DataTable[REG_LAMP_1] == 0) ZbGPIO_SwitchLampPin(Lamp_1, FALSE);
-	else ZbGPIO_SwitchLampPin(Lamp_1, TRUE);
-
-	if (DataTable[REG_LAMP_2] == 0) ZbGPIO_SwitchLampPin(Lamp_2, FALSE);
-	else ZbGPIO_SwitchLampPin(Lamp_2, TRUE);
-
-	if (DataTable[REG_LAMP_3] == 0) ZbGPIO_SwitchLampPin(Lamp_3, FALSE);
-	else ZbGPIO_SwitchLampPin(Lamp_3, TRUE);
+	ZbGPIO_SwitchLamp1(DataTable[REG_LAMP_1]);
+	ZbGPIO_SwitchLamp2(DataTable[REG_LAMP_2]);
 
 	ZbGPIO_ReadSensors();
 	DataTable[REG_SENSOR_1] = (PATCH_INVERT_SEN0_INPUT ? !Sensor1 : Sensor1) ? 1 : 0;

@@ -43,7 +43,10 @@
 //
 #define PIN_LAMP_0			15
 #define PIN_LAMP_1			14
-#define PIN_LAMP_2			33
+//
+#define PIN_LAMP_0_V11		11
+#define PIN_LAMP_1_V11		9
+#define PIN_OPTO_SW_V11		10
 //
 #define PIN_WD_RST			32
 
