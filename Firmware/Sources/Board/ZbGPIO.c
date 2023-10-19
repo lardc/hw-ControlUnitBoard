@@ -43,6 +43,14 @@ void ZbGPIO_ToggleLedPin()
 }
 // ----------------------------------------
 
+void ZbGPIO_TurnOnPC()
+{
+	ZwGPIO_WritePin(PIN_OPTO_SW, TRUE);
+	DELAY_US(500000);
+	ZwGPIO_WritePin(PIN_OPTO_SW, FALSE);
+}
+// ----------------------------------------
+
 void ZbGPIO_SwitchLamp1(Boolean Set)
 {
 	ZwGPIO_WritePin(PIN_LAMP_0, Set);

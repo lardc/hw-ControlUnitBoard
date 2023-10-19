@@ -17,55 +17,34 @@
 #include "Global.h"
 #include "Flash.h"
 
-
 // FORWARD FUNCTIONS
-// -----------------------------------------
 Boolean InitializeCPU();
 void InitializeTimers();
 void InitializeSCI();
 void InitializeCAN();
-void InitializeBoard();
-void InitializeController(Boolean GoodClock);
-// -----------------------------------------
-
 
 // FORWARD ISRs
-// -----------------------------------------
 // CPU Timer 0 ISR
 ISRCALL Timer0_ISR();
 // CPU Timer 2 ISR
 ISRCALL Timer2_ISR();
 // CAN Line 0 ISR
 ISRCALL CAN0_ISR();
-// -----------------------------------------
-
 
 // FUNCTIONS
-// -----------------------------------------
-// Program main function
 void main()
 {
-	Boolean clockInitResult;
-
-	// Boot process
-	clockInitResult = InitializeCPU();
-
-	// Only if good clocking was established
-	if(clockInitResult)
-	{
-		InitializeTimers();
-		InitializeCAN();
-		InitializeBoard();
-	}
-
-	// Turn on PC
-	ZwGPIO_WritePin(PIN_OPTO_SW, TRUE);
-	DELAY_US(500000);
-	ZwGPIO_WritePin(PIN_OPTO_SW, FALSE);
-
-	// Try initialize SCI in spite of result of clock initialization
+	InitializeCPU();
+	InitializeTimers();
+	InitializeCAN();
 	InitializeSCI();
+
+	// Инициализация EEPROM, контроллера и GPIO (с учётом настроек в DT)
 	FLASH_Init();
+	CONTROL_Init();
+
+	ZbGPIO_Init();
+	ZbGPIO_TurnOnPC();
 
 	// Setup ISRs
 	BEGIN_ISR_MAP
@@ -77,31 +56,20 @@ void main()
 	// Init board external watch-dog
    	ZbWatchDog_Init();
 
-   	// Initialize controller logic
-	InitializeController(clockInitResult);
-
 	// Enable interrupts
 	EINT;
 	ERTM;
 
-	// Only if good clocking was established
-	if(clockInitResult)
-	{
-		// Enable interrupts
-		EINT;
-		ERTM;
+	// Set watch-dog as WDRST
+	ZwSystem_SelectDogFunc(FALSE);
+	// Enable watch-dog
+	ZwSystem_EnableDog(SYS_WD_PRESCALER);
+	// Lock WD configuration
+	ZwSystem_LockDog();
 
-		// Set watch-dog as WDRST
-		ZwSystem_SelectDogFunc(FALSE);
-		// Enable watch-dog
-		ZwSystem_EnableDog(SYS_WD_PRESCALER);
-		// Lock WD configuration
-		ZwSystem_LockDog();
-
-		// Start system ticks timer
-		ZwTimer_StartT0();
-		ZwTimer_StartT2();
-	}
+	// Start system ticks timer
+	ZwTimer_StartT0();
+	ZwTimer_StartT2();
 
 	// Background cycle
 	while(TRUE)
@@ -183,13 +151,6 @@ void InitializeBoard()
 {
 	// Init board GPIO
    	ZbGPIO_Init();
-}
-// -----------------------------------------
-
-void InitializeController(Boolean GoodClock)
-{
-	// Init controllers and logic
-	CONTROL_Init(!GoodClock);
 }
 // -----------------------------------------
 

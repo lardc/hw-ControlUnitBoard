@@ -30,13 +30,12 @@ volatile Int16U CONTROL_BootLoaderRequest = 0;
 
 // Forward functions
 //
-static void CONTROL_SetDeviceState(DeviceState NewState);
 static void CONTROL_FillWPPartDefault();
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError);
 
 // Functions
 //
-void CONTROL_Init(Boolean BadClockDetected)
+void CONTROL_Init()
 {
 	// Variables for endpoint configuration
 	Int16U EPIndexes[EP_COUNT] = {EP16_Data_1};
@@ -47,7 +46,7 @@ void CONTROL_Init(Boolean BadClockDetected)
 	EPROMServiceConfig EPROMService = { &ZbMemory_WriteValuesEPROM, &ZbMemory_ReadValuesEPROM };
 	
 	// Init data table
-	DT_Init(EPROMService, BadClockDetected);
+	DT_Init(EPROMService, FALSE);
 	DT_SaveFirmwareInfo(DEVICE_CAN_ADDRESS, 0);
 	// Fill state variables with default values
 	CONTROL_FillWPPartDefault();
@@ -59,20 +58,8 @@ void CONTROL_Init(Boolean BadClockDetected)
 	DEVPROFILE_ResetControlSection();
 	DataTable[REG_MME_CODE] = MME_CODE;
 	
-	if(!BadClockDetected)
-	{
-		if(ZwSystem_GetDogAlarmFlag())
-		{
-			DataTable[REG_WARNING] = WARNING_WATCHDOG_RESET;
-			ZwSystem_ClearDogAlarmFlag();
-		}
-	}
-	else
-	{
-		CycleActive = TRUE;
-		DataTable[REG_DISABLE_REASON] = DISABLE_BAD_CLOCK;
-		CONTROL_SetDeviceState(DS_Disabled);
-	}
+	if(ZwSystem_GetDogAlarmFlag())
+		ZwSystem_ClearDogAlarmFlag();
 }
 // ----------------------------------------
 
@@ -89,14 +76,6 @@ void CONTROL_Idle()
 void CONTROL_NotifyCANFault(ZwCAN_SysFlags Flag)
 {
 	DEVPROFILE_NotifyCANFault(Flag);
-}
-// ----------------------------------------
-
-static void CONTROL_SetDeviceState(DeviceState NewState)
-{
-	// Set new state
-	CONTROL_State = NewState;
-	DataTable[REG_DEV_STATE] = NewState;
 }
 // ----------------------------------------
 

@@ -15,9 +15,7 @@
 // Constants
 typedef enum __DeviceState
 {
-	DS_None			= 0,
-	DS_Fault		= 1,
-	DS_Disabled		= 2
+	DS_None			= 0
 } DeviceState;
 
 
@@ -34,7 +32,7 @@ extern volatile Int16U CONTROL_BootLoaderRequest;
 // Functions
 //
 // Initialize controller
-void CONTROL_Init(Boolean BadClockDetected);
+void CONTROL_Init();
 // Update low-priority states
 void CONTROL_Idle();
 // Notify that CAN system fault occurs

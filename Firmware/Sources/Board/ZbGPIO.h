@@ -26,5 +26,6 @@ void ZbGPIO_ToggleLedPin();
 void ZbGPIO_ReadSensors();
 void ZbGPIO_SwitchLamp1(Boolean Set);
 void ZbGPIO_SwitchLamp2(Boolean Set);
+void ZbGPIO_TurnOnPC();
 
 #endif // __ZBGPIO_H

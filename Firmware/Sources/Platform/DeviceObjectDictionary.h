@@ -56,7 +56,7 @@
 
 // ENDPOINTS
 //
-#define EP16_Data_1					1	// Data of 1
+#define EP16_Data_1					1
 
 // PROBLEM CODES
 //
@@ -64,19 +64,15 @@
 
 // FAULT CODES
 //
-#define FAULT_NONE					0	// No fault
+#define FAULT_NONE					0
 
 // WARNING CODES
 //
 #define WARNING_NONE				0
-//
-#define WARNING_WATCHDOG_RESET		1001	// System has been reseted by WD
 
 // DISABLE CODES
 //
 #define DISABLE_NONE				0
-//
-#define DISABLE_BAD_CLOCK			1001	// Problem with main oscillator
 
 // DIAG CODES
 //
