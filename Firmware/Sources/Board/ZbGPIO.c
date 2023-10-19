@@ -7,8 +7,11 @@
 
 // Include
 #include "SysConfig.h"
+#include "DeviceObjectDictionary.h"
+#include "DataTable.h"
 
 #define REFdebounce	50
+
 Int16U 	sCounter1_0 = 0, sCounter1_1 = 0,
 		sCounter2_0 = 0, sCounter2_1 = 0,
 		sCounter3_0 = 0, sCounter3_1 = 0,
@@ -16,19 +19,30 @@ Int16U 	sCounter1_0 = 0, sCounter1_1 = 0,
 
 Boolean Sensor1 = FALSE, Sensor2 = FALSE, Sensor3 = FALSE, Sensor4 = FALSE;
 
+static Int16U VAR_PIN_OPTO_SW = PIN_OPTO_SW,
+		VAR_PIN_LAMP_0 = PIN_LAMP_0, VAR_PIN_LAMP_1 = PIN_LAMP_1;
+
 // Functions
 //
 void ZbGPIO_Init()
 {
-   	ZwGPIO_WritePin(PIN_LED, FALSE);
-   	ZwGPIO_WritePin(PIN_OPTO_SW, FALSE);
-   	ZwGPIO_PinToOutput(PIN_LED);
-   	ZwGPIO_PinToOutput(PIN_OPTO_SW);
+	if(DataTable[REG_PCB1_1])
+	{
+		VAR_PIN_OPTO_SW = PIN_OPTO_SW_V11;
+		VAR_PIN_LAMP_0 = PIN_LAMP_0_V11;
+		VAR_PIN_LAMP_1 = PIN_LAMP_1_V11;
+	}
 
-   	ZwGPIO_WritePin(PIN_LAMP_0, FALSE);
-   	ZwGPIO_WritePin(PIN_LAMP_1, FALSE);
-   	ZwGPIO_PinToOutput(PIN_LAMP_0);
-   	ZwGPIO_PinToOutput(PIN_LAMP_1);
+   	ZwGPIO_WritePin(PIN_LED, FALSE);
+   	ZwGPIO_PinToOutput(PIN_LED);
+
+   	ZwGPIO_WritePin(VAR_PIN_OPTO_SW, FALSE);
+   	ZwGPIO_PinToOutput(VAR_PIN_OPTO_SW);
+
+   	ZwGPIO_WritePin(VAR_PIN_LAMP_0, FALSE);
+   	ZwGPIO_WritePin(VAR_PIN_LAMP_1, FALSE);
+   	ZwGPIO_PinToOutput(VAR_PIN_LAMP_0);
+   	ZwGPIO_PinToOutput(VAR_PIN_LAMP_1);
 
    	ZwGPIO_PinToInput(PIN_SENS_0, TRUE, 0);
    	ZwGPIO_PinToInput(PIN_SENS_1, TRUE, 0);
@@ -45,21 +59,21 @@ void ZbGPIO_ToggleLedPin()
 
 void ZbGPIO_TurnOnPC()
 {
-	ZwGPIO_WritePin(PIN_OPTO_SW, TRUE);
+	ZwGPIO_WritePin(VAR_PIN_OPTO_SW, TRUE);
 	DELAY_US(500000);
-	ZwGPIO_WritePin(PIN_OPTO_SW, FALSE);
+	ZwGPIO_WritePin(VAR_PIN_OPTO_SW, FALSE);
 }
 // ----------------------------------------
 
 void ZbGPIO_SwitchLamp1(Boolean Set)
 {
-	ZwGPIO_WritePin(PIN_LAMP_0, Set);
+	ZwGPIO_WritePin(VAR_PIN_LAMP_0, Set);
 }
 // ----------------------------------------
 
 void ZbGPIO_SwitchLamp2(Boolean Set)
 {
-	ZwGPIO_WritePin(PIN_LAMP_1, Set);
+	ZwGPIO_WritePin(VAR_PIN_LAMP_1, Set);
 }
 // ----------------------------------------
 
