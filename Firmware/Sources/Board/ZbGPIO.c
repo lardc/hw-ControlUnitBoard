@@ -59,9 +59,18 @@ void ZbGPIO_ToggleLedPin()
 
 void ZbGPIO_TurnOnPC()
 {
-	ZwGPIO_WritePin(VAR_PIN_OPTO_SW, TRUE);
-	DELAY_US(500000);
-	ZwGPIO_WritePin(VAR_PIN_OPTO_SW, FALSE);
+	pInt16U TurnFlagPointer = (pInt16U)0x3FE;
+	const Int16U TurnFlagValue = 0xA5A5;
+
+	// Включение ПК только при отсутствии выставленного в памяти флага
+	if(TurnFlagValue != *TurnFlagPointer)
+	{
+		*TurnFlagPointer = TurnFlagValue;
+
+		ZwGPIO_WritePin(VAR_PIN_OPTO_SW, TRUE);
+		DELAY_US(500000);
+		ZwGPIO_WritePin(VAR_PIN_OPTO_SW, FALSE);
+	}
 }
 // ----------------------------------------
 
