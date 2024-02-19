@@ -17,6 +17,8 @@
 typedef struct __BCCIM_Interface
 {
 	pBCCI_IOConfig IOConfig;
+	Int32U TimeoutValueTicks;
+	volatile Int64U *pTimerCounter;
 } BCCIM_Interface, *pBCCIM_Interface;
 
 
@@ -25,7 +27,7 @@ typedef struct __BCCIM_Interface
 // Set active scci interface
 void BCCIM_SetActiveSCCI(pSCCI_Interface Interface);
 // Init interface instance
-void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig);
+void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig, Int32U MessageTimeoutTicks, volatile Int64U *pTimer);
 // Process packets
 void BCCIM_Process(pBCCIM_Interface Interface);
 //

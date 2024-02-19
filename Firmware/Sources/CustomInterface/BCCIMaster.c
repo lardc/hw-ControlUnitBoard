@@ -77,10 +77,12 @@ void BCCIM_SetActiveSCCI(pSCCI_Interface Interface)
 }
 // ----------------------------------------
 
-void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig)
+void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig, Int32U MessageTimeoutTicks, volatile Int64U *pTimer)
 {
 	// Save parameters
 	Interface->IOConfig = IOConfig;
+	Interface->TimeoutValueTicks = MessageTimeoutTicks;
+	Interface->pTimerCounter = pTimer;
 
 	// Setup messages
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_R_16, CAN_ID_R_16, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
