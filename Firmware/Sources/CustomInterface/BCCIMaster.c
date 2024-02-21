@@ -58,6 +58,7 @@ static void BCCIM_HandleWrite32(pBCCIM_Interface Interface);
 static void BCCIM_HandleCall(pBCCIM_Interface Interface);
 static void BCCIM_HandleReadBlock16(pBCCIM_Interface Interface);
 static void BCCIM_HandleError(pBCCIM_Interface Interface);
+Int16U BCCIM_WaitResponse(pBCCIM_Interface Interface, Int16U Mailbox);
 //
 static void BCCIM_SendFrame(pBCCIM_Interface Interface, Int16U Mailbox, pCANMessage Message, Int32U Node,
 		Int16U Command);
@@ -68,6 +69,7 @@ static Int16U ReadBlock16BufferCounter = 0;
 //
 static Int16U SavedEndpointRB16;
 static pSCCI_Interface ActiveSCCI;
+static Int16U SavedErrorDetails = 0;
 
 // Functions
 //
@@ -131,12 +133,22 @@ void BCCIM_Process(pBCCIM_Interface Interface)
 }
 // ----------------------------------------
 
-void BCCIM_Read16(pBCCIM_Interface Interface, Int16U Node, Int16U Address)
+Int16U BCCIM_Read16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pInt16U Data)
 {
+	Int16U ret;
 	CANMessage message;
 	
 	message.HIGH.WORD.WORD_0 = Address;
 	BCCIM_SendFrame(Interface, MBOX_R_16, &message, Node, CAN_ID_R_16);
+
+	if(ret = BCCIM_WaitResponse(Interface, MBOX_R_16) == ERR_NO_ERROR)
+	{
+		Interface->IOConfig->IO_GetMessage(MBOX_R_16, &message);
+		if(Data)
+			*Data = message.HIGH.WORD.WORD_1;
+	}
+
+	return ret;
 }
 // ----------------------------------------
 
@@ -395,4 +407,31 @@ static void BCCIM_SendFrame(pBCCIM_Interface Interface, Int16U Mailbox, pCANMess
 	Interface->IOConfig->IO_SendMessageEx(Mailbox, Message, TRUE, FALSE);
 }
 
+Int16U BCCIM_WaitResponse(pBCCIM_Interface Interface, Int16U Mailbox)
+{
+	Int64U timeout;
+	CANMessage message;
+
+	// Wait for response
+	timeout = Interface->TimeoutValueTicks + *(Interface->pTimerCounter);
+	while(*(Interface->pTimerCounter) < timeout)
+	{
+		// In case of error
+		if(Interface->IOConfig->IO_IsMessageReceived(MBOX_ERR_A, NULL))
+		{
+			Interface->IOConfig->IO_GetMessage(MBOX_ERR_A, &message);
+			SavedErrorDetails = message.HIGH.WORD.WORD_1;
+			return message.HIGH.WORD.WORD_0;
+		}
+		else if(Interface->IOConfig->IO_IsMessageReceived(Mailbox, NULL))
+			return ERR_NO_ERROR;
+	}
+
+	return ERR_TIMEOUT;
+}
+
+Int16U BCCIM_GetSavedErrorDetails()
+{
+	return SavedErrorDetails;
+}
 // No more.

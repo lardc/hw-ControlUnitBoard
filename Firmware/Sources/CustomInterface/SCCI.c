@@ -474,8 +474,14 @@ static void SCCI_HandleRead16(pSCCI_Interface Interface)
 	}
 	else
 	{
+		Int16U data;
 		BCCIM_SetActiveSCCI(Interface);
-		BCCIM_Read16(&DEVICE_CAN_Interface, node, addr);
+		Int16U err = BCCIM_Read16(&DEVICE_CAN_Interface, node, addr, &data);
+
+		if(err == ERR_NO_ERROR)
+			SCCI_AnswerRead16(Interface, node, addr, &data);
+		else
+			SCCI_AnswerError(Interface, node, err, BCCIM_GetSavedErrorDetails());
 	}
 }
 // ----------------------------------------

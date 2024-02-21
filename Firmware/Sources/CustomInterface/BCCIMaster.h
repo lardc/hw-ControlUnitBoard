@@ -32,7 +32,7 @@ void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig, Int32U Mess
 void BCCIM_Process(pBCCIM_Interface Interface);
 //
 // Read 16bit value
-void BCCIM_Read16(pBCCIM_Interface Interface, Int16U Node, Int16U Address);
+Int16U BCCIM_Read16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pInt16U Data);
 // Read double 16bit value
 void BCCIM_Read16Double(pBCCIM_Interface Interface, Int16U Node, Int16U Address1, Int16U Address2);
 // Read 16bit value
@@ -50,5 +50,6 @@ void BCCIM_Call(pBCCIM_Interface Interface, Int16U Node, Int16U Action);
 // Read block 16bit value
 void BCCIM_ReadBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint, Boolean Start);
 
+Int16U BCCIM_GetSavedErrorDetails();
 
 #endif // __BCCI_MASTER_H
