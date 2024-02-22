@@ -171,13 +171,15 @@ void BCCIM_Read32(pBCCIM_Interface Interface, Int16U Node, Int16U Address)
 }
 // ----------------------------------------
 
-void BCCIM_Write16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int16U Data)
+Int16U BCCIM_Write16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int16U Data)
 {
 	CANMessage message;
 	
 	message.HIGH.WORD.WORD_0 = Address;
 	message.HIGH.WORD.WORD_1 = Data;
 	BCCIM_SendFrame(Interface, MBOX_W_16, &message, Node, CAN_ID_W_16);
+
+	return BCCIM_WaitResponse(Interface, MBOX_W_16);
 }
 // ----------------------------------------
 

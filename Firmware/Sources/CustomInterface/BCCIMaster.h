@@ -38,7 +38,7 @@ void BCCIM_Read16Double(pBCCIM_Interface Interface, Int16U Node, Int16U Address1
 // Read 16bit value
 void BCCIM_Read32(pBCCIM_Interface Interface, Int16U Node, Int16U Address);
 // Write 16bit value
-void BCCIM_Write16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int16U Data);
+Int16U BCCIM_Write16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int16U Data);
 // Write block 16bit value
 void BCCIM_WriteBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint, pInt16U Data, Int16U DataLength);
 // Write double 16bit value
