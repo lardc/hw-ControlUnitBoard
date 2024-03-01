@@ -31,16 +31,12 @@ void BCCIM_Process(pBCCIM_Interface Interface);
 //
 // Read 16bit value
 Int16U BCCIM_Read16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pInt16U Data);
-// Read double 16bit value
-void BCCIM_Read16Double(pBCCIM_Interface Interface, Int16U Node, Int16U Address1, Int16U Address2);
-// Read 16bit value
+// Read 32bit value
 void BCCIM_Read32(pBCCIM_Interface Interface, Int16U Node, Int16U Address);
 // Write 16bit value
 Int16U BCCIM_Write16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int16U Data);
 // Write block 16bit value
 void BCCIM_WriteBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint, pInt16U Data, Int16U DataLength);
-// Write double 16bit value
-void BCCIM_Write16Double(pBCCIM_Interface Interface, Int16U Node, Int16U Address1, Int16U Data1, Int16U Address2, Int16U Data2);
 // Write 32bit value
 void BCCIM_Write32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int32U Data);
 // Call function

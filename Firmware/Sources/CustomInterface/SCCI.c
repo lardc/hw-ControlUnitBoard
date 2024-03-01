@@ -516,7 +516,7 @@ static void SCCI_HandleRead16Double(pSCCI_Interface Interface)
 	}
 	else
 	{
-		BCCIM_Read16Double(&DEVICE_CAN_Interface, node, addr1, addr2);
+		SCCI_SendErrorFrame(Interface, ERR_NOT_SUPPORTED, (Interface->MessageBuffer[1] >> 8) & FUNCTION_SCODE_MASK);
 	}
 }
 
@@ -675,7 +675,7 @@ static void SCCI_HandleWrite16Double(pSCCI_Interface Interface)
 	}
 	else
 	{
-		BCCIM_Write16Double(&DEVICE_CAN_Interface, node, addr1, data1, addr2, data2);
+		SCCI_SendErrorFrame(Interface, ERR_NOT_SUPPORTED, (Interface->MessageBuffer[1] >> 8) & FUNCTION_SCODE_MASK);
 	}
 }
 // ----------------------------------------

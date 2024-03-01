@@ -146,16 +146,6 @@ Int16U BCCIM_Read16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pIn
 }
 // ----------------------------------------
 
-void BCCIM_Read16Double(pBCCIM_Interface Interface, Int16U Node, Int16U Address1, Int16U Address2)
-{
-	CANMessage message;
-	
-	message.HIGH.WORD.WORD_0 = Address1;
-	message.HIGH.WORD.WORD_1 = Address2;
-	BCCIM_SendFrame(Interface, MBOX_R_16_2, &message, Node, CAN_ID_R_16_2);
-}
-// ----------------------------------------
-
 void BCCIM_Read32(pBCCIM_Interface Interface, Int16U Node, Int16U Address)
 {
 	CANMessage message;
@@ -186,19 +176,6 @@ void BCCIM_WriteBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint
 	message.LOW.WORD.WORD_2 = *(Data + 1);
 	message.LOW.WORD.WORD_3 = *(Data + 2);
 	BCCIM_SendFrame(Interface, MBOX_WB_16, &message, Node, CAN_ID_WB_16);
-}
-// ----------------------------------------
-
-void BCCIM_Write16Double(pBCCIM_Interface Interface, Int16U Node, Int16U Address1, Int16U Data1, Int16U Address2,
-		Int16U Data2)
-{
-	CANMessage message;
-	
-	message.HIGH.WORD.WORD_0 = Address1;
-	message.HIGH.WORD.WORD_1 = Data1;
-	message.LOW.WORD.WORD_2 = Address2;
-	message.LOW.WORD.WORD_3 = Data2;
-	BCCIM_SendFrame(Interface, MBOX_W_16_2, &message, Node, CAN_ID_W_16_2);
 }
 // ----------------------------------------
 
