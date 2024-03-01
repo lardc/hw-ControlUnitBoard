@@ -135,9 +135,9 @@ Int16U BCCIM_Read16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pIn
 	message.HIGH.WORD.WORD_0 = Address;
 	BCCIM_SendFrame(Interface, MBOX_R_16, &message, Node, CAN_ID_R_16);
 
-	if(ret = BCCIM_WaitResponse(Interface, MBOX_R_16) == ERR_NO_ERROR)
+	if(ret = BCCIM_WaitResponse(Interface, MBOX_R_16_A) == ERR_NO_ERROR)
 	{
-		Interface->IOConfig->IO_GetMessage(MBOX_R_16, &message);
+		Interface->IOConfig->IO_GetMessage(MBOX_R_16_A, &message);
 		if(Data)
 			*Data = message.HIGH.WORD.WORD_1;
 	}
@@ -146,12 +146,23 @@ Int16U BCCIM_Read16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pIn
 }
 // ----------------------------------------
 
-void BCCIM_Read32(pBCCIM_Interface Interface, Int16U Node, Int16U Address)
+Int16U BCCIM_Read32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pInt32U Data)
 {
+	Int16U ret;
 	CANMessage message;
 	
 	message.HIGH.WORD.WORD_0 = Address;
 	BCCIM_SendFrame(Interface, MBOX_R_32, &message, Node, CAN_ID_R_32);
+
+	if(ret = BCCIM_WaitResponse(Interface, MBOX_R_32_A) == ERR_NO_ERROR)
+	{
+		Interface->IOConfig->IO_GetMessage(MBOX_R_32_A, &message);
+		if(Data)
+			*Data = (Int32U)message.HIGH.WORD.WORD_1 << 16 | message.LOW.WORD.WORD_2;
+	}
+
+	return ret;
+
 }
 // ----------------------------------------
 
@@ -163,7 +174,7 @@ Int16U BCCIM_Write16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, In
 	message.HIGH.WORD.WORD_1 = Data;
 	BCCIM_SendFrame(Interface, MBOX_W_16, &message, Node, CAN_ID_W_16);
 
-	return BCCIM_WaitResponse(Interface, MBOX_W_16);
+	return BCCIM_WaitResponse(Interface, MBOX_W_16_A);
 }
 // ----------------------------------------
 
@@ -179,7 +190,7 @@ void BCCIM_WriteBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint
 }
 // ----------------------------------------
 
-void BCCIM_Write32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int32U Data)
+Int16U BCCIM_Write32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int32U Data)
 {
 	CANMessage message;
 	
@@ -187,6 +198,8 @@ void BCCIM_Write32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int3
 	message.HIGH.WORD.WORD_1 = Data >> 16;
 	message.LOW.WORD.WORD_2 = Data & 0xFFFF;
 	BCCIM_SendFrame(Interface, MBOX_W_32, &message, Node, CAN_ID_W_32);
+
+	return BCCIM_WaitResponse(Interface, MBOX_W_32_A);
 }
 // ----------------------------------------
 

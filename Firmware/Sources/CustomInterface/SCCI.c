@@ -545,7 +545,13 @@ static void SCCI_HandleRead32(pSCCI_Interface Interface)
 	}
 	else
 	{
-		BCCIM_Read32(&DEVICE_CAN_Interface, node, addr);
+		Int16U data;
+		Int16U err = BCCIM_Read32(&DEVICE_CAN_Interface, node, addr, &data);
+
+		if(err == ERR_NO_ERROR)
+			SCCI_AnswerRead32(Interface, node, addr, data);
+		else
+			SCCI_AnswerError(Interface, node, err, BCCIM_GetSavedErrorDetails());
 	}
 }
 // ----------------------------------------
@@ -620,7 +626,12 @@ static void SCCI_HandleWrite32(pSCCI_Interface Interface)
 	}
 	else
 	{
-		BCCIM_Write32(&DEVICE_CAN_Interface, node, addr, data);
+		Int16U err = BCCIM_Write32(&DEVICE_CAN_Interface, node, addr, data);
+
+		if(err == ERR_NO_ERROR)
+			SCCI_AnswerWrite32(Interface, node, addr);
+		else
+			SCCI_AnswerError(Interface, node, err, BCCIM_GetSavedErrorDetails());
 	}
 }
 // ----------------------------------------
