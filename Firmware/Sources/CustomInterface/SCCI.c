@@ -475,11 +475,10 @@ static void SCCI_HandleRead16(pSCCI_Interface Interface)
 	else
 	{
 		Int16U data;
-		BCCIM_SetActiveSCCI(Interface);
 		Int16U err = BCCIM_Read16(&DEVICE_CAN_Interface, node, addr, &data);
 
 		if(err == ERR_NO_ERROR)
-			SCCI_AnswerRead16(Interface, node, addr, &data);
+			SCCI_AnswerRead16(Interface, node, addr, data);
 		else
 			SCCI_AnswerError(Interface, node, err, BCCIM_GetSavedErrorDetails());
 	}
@@ -517,7 +516,6 @@ static void SCCI_HandleRead16Double(pSCCI_Interface Interface)
 	}
 	else
 	{
-		BCCIM_SetActiveSCCI(Interface);
 		BCCIM_Read16Double(&DEVICE_CAN_Interface, node, addr1, addr2);
 	}
 }
@@ -547,7 +545,6 @@ static void SCCI_HandleRead32(pSCCI_Interface Interface)
 	}
 	else
 	{
-		BCCIM_SetActiveSCCI(Interface);
 		BCCIM_Read32(&DEVICE_CAN_Interface, node, addr);
 	}
 }
@@ -583,7 +580,6 @@ static void SCCI_HandleWrite16(pSCCI_Interface Interface)
 	}
 	else
 	{
-		BCCIM_SetActiveSCCI(Interface);
 		Int16U err = BCCIM_Write16(&DEVICE_CAN_Interface, node, addr, data);
 
 		if(err == ERR_NO_ERROR)
@@ -624,7 +620,6 @@ static void SCCI_HandleWrite32(pSCCI_Interface Interface)
 	}
 	else
 	{
-		BCCIM_SetActiveSCCI(Interface);
 		BCCIM_Write32(&DEVICE_CAN_Interface, node, addr, data);
 	}
 }
@@ -680,7 +675,6 @@ static void SCCI_HandleWrite16Double(pSCCI_Interface Interface)
 	}
 	else
 	{
-		BCCIM_SetActiveSCCI(Interface);
 		BCCIM_Write16Double(&DEVICE_CAN_Interface, node, addr1, data1, addr2, data2);
 	}
 }
@@ -750,7 +744,6 @@ static void SCCI_HandleWriteBlock16(pSCCI_Interface Interface)
 	}
 	else
 	{
-		BCCIM_SetActiveSCCI(Interface);
 		BCCIM_WriteBlock16(&DEVICE_CAN_Interface, node, epnt, &Interface->MessageBuffer[3], length);
 	}
 }
@@ -791,7 +784,6 @@ static void SCCI_HandleReadBlockFast16(pSCCI_Interface Interface, Boolean Repeat
 	{
 		if(!Repeat)
 		{
-			BCCIM_SetActiveSCCI(Interface);
 			BCCIM_ReadBlock16(&DEVICE_CAN_Interface, node, epnt, TRUE);
 		}
 		else
@@ -842,7 +834,6 @@ static void SCCI_HandleCall(pSCCI_Interface Interface)
 			SM_ProcessTOUCommand(action);
 #endif
 
-		BCCIM_SetActiveSCCI(Interface);
 		BCCIM_Call(&DEVICE_CAN_Interface, node, action);
 	}
 }

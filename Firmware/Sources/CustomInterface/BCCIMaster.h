@@ -24,8 +24,6 @@ typedef struct __BCCIM_Interface
 
 // Functions
 //
-// Set active scci interface
-void BCCIM_SetActiveSCCI(pSCCI_Interface Interface);
 // Init interface instance
 void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig, Int32U MessageTimeoutTicks, volatile Int64U *pTimer);
 // Process packets
