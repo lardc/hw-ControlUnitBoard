@@ -24,8 +24,6 @@ void InitializeSCI();
 void InitializeCAN();
 
 // FORWARD ISRs
-// CPU Timer 0 ISR
-ISRCALL Timer0_ISR();
 // CPU Timer 2 ISR
 ISRCALL Timer2_ISR();
 // CAN Line 0 ISR
@@ -48,13 +46,12 @@ void main()
 
 	// Setup ISRs
 	BEGIN_ISR_MAP
-		ADD_ISR(TINT0, Timer0_ISR);
 		ADD_ISR(TINT2, Timer2_ISR);
 		ADD_ISR(ECAN0INTA, CAN0_ISR);
 	END_ISR_MAP
 
 	// Init board external watch-dog
-   	ZbWatchDog_Init();
+	ZbWatchDog_Init();
 
 	// Enable interrupts
 	EINT;
@@ -66,7 +63,6 @@ void main()
 	ZwSystem_EnableDog(SYS_WD_PRESCALER);
 
 	// Start system ticks timer
-	ZwTimer_StartT0();
 	ZwTimer_StartT2();
 
 	// Background cycle
@@ -78,39 +74,33 @@ void main()
 // Initialize and prepare DSP
 Boolean InitializeCPU()
 {
-    Boolean clockInitResult;
+	Boolean clockInitResult;
 
 	// Init clock and peripherals
-    clockInitResult = ZwSystem_Init(CPU_PLL, CPU_CLKINDIV, SYS_LOSPCP, SYS_HISPCP, SYS_PUMOD);
+	clockInitResult = ZwSystem_Init(CPU_PLL, CPU_CLKINDIV, SYS_LOSPCP, SYS_HISPCP, SYS_PUMOD);
 
-    if(clockInitResult)
-    {
+	if(clockInitResult)
+	{
 		// Do default GPIO configuration
 		ZwGPIO_Init(GPIO_TSAMPLE, GPIO_TSAMPLE, GPIO_TSAMPLE, GPIO_TSAMPLE, GPIO_TSAMPLE);
 		// Initialize PIE
 		ZwPIE_Init();
 		// Prepare PIE vectors
 		ZwPIE_Prepare();
-    }
+	}
 
 	// Config flash
 	ZW_FLASH_CODE_SHADOW;
 	ZW_FLASH_OPTIMIZE(FLASH_FWAIT, FLASH_OTPWAIT);
 
-   	return clockInitResult;
+	return clockInitResult;
 }
 // -----------------------------------------
 
 // Initialize CPU timers
 void InitializeTimers()
 {
-    ZwTimer_InitT0();
-	ZwTimer_SetT0(TIMER0_PERIOD);
-	ZwTimer_EnableInterruptsT0(TRUE);
-
-    ZwTimer_InitT1();
-
-    ZwTimer_InitT2();
+	ZwTimer_InitT2();
 	ZwTimer_SetT2(TIMER2_PERIOD);
 	ZwTimer_EnableInterruptsT2(TRUE);
 }
@@ -139,33 +129,32 @@ void InitializeCAN()
 	// Register system handler
 	ZwCANa_RegisterSysEventHandler(&CONTROL_NotifyCANFault);
 
-    // Allow interrupts for CAN
-    ZwCANa_InitInterrupts(TRUE);
-    ZwCANa_EnableInterrupts(TRUE);
+	// Allow interrupts for CAN
+	ZwCANa_InitInterrupts(TRUE);
+	ZwCANa_EnableInterrupts(TRUE);
 }
 // -----------------------------------------
 
 void InitializeBoard()
 {
 	// Init board GPIO
-   	ZbGPIO_Init();
+	ZbGPIO_Init();
 }
 // -----------------------------------------
 
 // ISRs
 // -----------------------------------------
 #ifdef BOOT_FROM_FLASH
-	#pragma CODE_SECTION(Timer0_ISR, "ramfuncs");
 	#pragma CODE_SECTION(Timer2_ISR, "ramfuncs");
 	#pragma CODE_SECTION(CAN0_ISR, "ramfuncs");
 #endif
 //
 #pragma INTERRUPT(Timer0_ISR, HPI);
 
-Int16U sensors = 0;
-ISRCALL Timer0_ISR(void)
+ISRCALL Timer2_ISR()
 {
 	static Int16U dbgCounter = 0;
+	CONTROL_TimeCounter++;
 
 	// Service watch-dogs
 	if (CONTROL_BootLoaderRequest != BOOT_LOADER_REQUEST)
@@ -174,19 +163,15 @@ ISRCALL Timer0_ISR(void)
 		ZbWatchDog_Strobe();
 	}
 
+	// Моргание светодиодом
 	++dbgCounter;
 	if(dbgCounter == DBG_COUNTER_PERIOD)
 	{
 		ZbGPIO_ToggleLedPin();
 		dbgCounter = 0;
 	}
-	// allow other interrupts from group 1
-	TIMER0_ISR_DONE;
-}
-// -----------------------------------------
 
-ISRCALL Timer2_ISR(void)
-{
+	// Управление лампами и датчиками
 	ZbGPIO_SwitchLamp1(DataTable[REG_LAMP_1]);
 	ZbGPIO_SwitchLamp2(DataTable[REG_LAMP_2]);
 
@@ -205,15 +190,12 @@ ISRCALL Timer2_ISR(void)
 // -----------------------------------------
 
 // Line 0 ISR
-ISRCALL CAN0_ISR(void)
+ISRCALL CAN0_ISR()
 {
-    // handle CAN system events
+	// handle CAN system events
 	ZwCANa_DispatchSysEvent();
 
 	// allow other interrupts from group 9
 	CAN_ISR_DONE;
 }
 // -----------------------------------------
-
-
-// No more.
