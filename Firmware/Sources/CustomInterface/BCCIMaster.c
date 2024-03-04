@@ -10,7 +10,6 @@
 #include "SysConfig.h"
 #include "DeviceProfile.h"
 #include "StateMachine.h"
-#include "DataTable.h"
 
 // Macro
 //
@@ -426,11 +425,9 @@ Int16U BCCIM_WaitResponse(pBCCIM_Interface Interface, Int16U Mailbox)
 		}
 		else if(Interface->IOConfig->IO_IsMessageReceived(Mailbox, NULL))
 		{
-			DataTable[18] = 10;
 			return ERR_NO_ERROR;
 		}
 	}
-	DataTable[17] = 11;
 	return ERR_TIMEOUT;
 }
 
