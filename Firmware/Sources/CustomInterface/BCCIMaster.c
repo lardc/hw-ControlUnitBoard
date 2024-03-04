@@ -10,6 +10,7 @@
 #include "SysConfig.h"
 #include "DeviceProfile.h"
 #include "StateMachine.h"
+#include "DataTable.h"
 
 // Macro
 //
@@ -132,10 +133,14 @@ Int16U BCCIM_Read16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pIn
 	Int16U ret;
 	CANMessage message;
 	
+	Interface->IOConfig->IO_GetMessage(MBOX_ERR_A, NULL);
+	Interface->IOConfig->IO_GetMessage(MBOX_R_16_A, NULL);
+	
 	message.HIGH.WORD.WORD_0 = Address;
 	BCCIM_SendFrame(Interface, MBOX_R_16, &message, Node, CAN_ID_R_16);
 
-	if(ret = BCCIM_WaitResponse(Interface, MBOX_R_16_A) == ERR_NO_ERROR)
+	ret = BCCIM_WaitResponse(Interface, MBOX_R_16_A);
+	if(ret == ERR_NO_ERROR)
 	{
 		Interface->IOConfig->IO_GetMessage(MBOX_R_16_A, &message);
 		if(Data)
@@ -150,11 +155,15 @@ Int16U BCCIM_Read32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pIn
 {
 	Int16U ret;
 	CANMessage message;
+
+	Interface->IOConfig->IO_GetMessage(MBOX_ERR_A, NULL);
+	Interface->IOConfig->IO_GetMessage(MBOX_R_32_A, NULL);
 	
 	message.HIGH.WORD.WORD_0 = Address;
 	BCCIM_SendFrame(Interface, MBOX_R_32, &message, Node, CAN_ID_R_32);
-
-	if(ret = BCCIM_WaitResponse(Interface, MBOX_R_32_A) == ERR_NO_ERROR)
+	
+	ret = BCCIM_WaitResponse(Interface, MBOX_R_32_A);
+	if(ret == ERR_NO_ERROR)
 	{
 		Interface->IOConfig->IO_GetMessage(MBOX_R_32_A, &message);
 		if(Data)
@@ -169,6 +178,9 @@ Int16U BCCIM_Read32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pIn
 Int16U BCCIM_Write16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int16U Data)
 {
 	CANMessage message;
+
+	Interface->IOConfig->IO_GetMessage(MBOX_ERR_A, NULL);
+	Interface->IOConfig->IO_GetMessage(MBOX_W_16_A, NULL);
 	
 	message.HIGH.WORD.WORD_0 = Address;
 	message.HIGH.WORD.WORD_1 = Data;
@@ -193,6 +205,9 @@ void BCCIM_WriteBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint
 Int16U BCCIM_Write32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int32U Data)
 {
 	CANMessage message;
+
+	Interface->IOConfig->IO_GetMessage(MBOX_ERR_A, NULL);
+	Interface->IOConfig->IO_GetMessage(MBOX_W_32_A, NULL);
 	
 	message.HIGH.WORD.WORD_0 = Address;
 	message.HIGH.WORD.WORD_1 = Data >> 16;
@@ -410,9 +425,12 @@ Int16U BCCIM_WaitResponse(pBCCIM_Interface Interface, Int16U Mailbox)
 			return message.HIGH.WORD.WORD_0;
 		}
 		else if(Interface->IOConfig->IO_IsMessageReceived(Mailbox, NULL))
+		{
+			DataTable[18] = 10;
 			return ERR_NO_ERROR;
+		}
 	}
-
+	DataTable[17] = 11;
 	return ERR_TIMEOUT;
 }
 

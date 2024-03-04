@@ -112,7 +112,7 @@ void DEVPROFILE_ProcessRequests()
 	// Handle interface requests
 	SCCI_Process(&DEVICE_RS232_Interface, CONTROL_TimeCounter, *MaskChangesFlag);
 	// Handle interface requests
-	BCCIM_Process(&DEVICE_CAN_Interface);
+	//BCCIM_Process(&DEVICE_CAN_Interface);
 }
 // ----------------------------------------
 
