@@ -545,7 +545,7 @@ static void SCCI_HandleRead32(pSCCI_Interface Interface)
 	}
 	else
 	{
-		Int16U data;
+		Int32U data;
 		Int16U err = BCCIM_Read32(&DEVICE_CAN_Interface, node, addr, &data);
 
 		if(err == ERR_NO_ERROR)

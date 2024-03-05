@@ -424,9 +424,7 @@ Int16U BCCIM_WaitResponse(pBCCIM_Interface Interface, Int16U Mailbox)
 			return message.HIGH.WORD.WORD_0;
 		}
 		else if(Interface->IOConfig->IO_IsMessageReceived(Mailbox, NULL))
-		{
 			return ERR_NO_ERROR;
-		}
 	}
 	return ERR_TIMEOUT;
 }
