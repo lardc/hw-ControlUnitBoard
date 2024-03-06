@@ -149,7 +149,6 @@ void InitializeBoard()
 	#pragma CODE_SECTION(CAN0_ISR, "ramfuncs");
 #endif
 //
-#pragma INTERRUPT(Timer0_ISR, HPI);
 
 ISRCALL Timer2_ISR()
 {
