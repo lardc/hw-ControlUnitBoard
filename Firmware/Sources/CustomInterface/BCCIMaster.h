@@ -40,7 +40,7 @@ void BCCIM_WriteBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint
 // Write 32bit value
 Int16U BCCIM_Write32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int32U Data);
 // Call function
-void BCCIM_Call(pBCCIM_Interface Interface, Int16U Node, Int16U Action);
+Int16U BCCIM_Call(pBCCIM_Interface Interface, Int16U Node, Int16U Action);
 // Read block 16bit value
 void BCCIM_ReadBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint, Boolean Start);
 

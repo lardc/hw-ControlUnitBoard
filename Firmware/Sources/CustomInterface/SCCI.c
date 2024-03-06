@@ -844,8 +844,12 @@ static void SCCI_HandleCall(pSCCI_Interface Interface)
 		if(node == SM_TOU_NODE_ID)
 			SM_ProcessTOUCommand(action);
 #endif
+		Int16U err = BCCIM_Call(&DEVICE_CAN_Interface, node, action);
 
-		BCCIM_Call(&DEVICE_CAN_Interface, node, action);
+		if(err == ERR_NO_ERROR)
+			SCCI_AnswerCall(Interface, node, action);
+		else
+			SCCI_AnswerError(Interface, node, err, BCCIM_GetSavedErrorDetails());
 	}
 }
 // ----------------------------------------

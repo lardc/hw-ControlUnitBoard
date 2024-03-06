@@ -217,12 +217,17 @@ Int16U BCCIM_Write32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, In
 }
 // ----------------------------------------
 
-void BCCIM_Call(pBCCIM_Interface Interface, Int16U Node, Int16U Action)
+Int16U BCCIM_Call(pBCCIM_Interface Interface, Int16U Node, Int16U Action)
 {
 	CANMessage message;
+
+	Interface->IOConfig->IO_GetMessage(MBOX_ERR_A, NULL);
+	Interface->IOConfig->IO_GetMessage(MBOX_C_A, NULL);
 	
 	message.HIGH.WORD.WORD_0 = Action;
 	BCCIM_SendFrame(Interface, MBOX_C, &message, Node, CAN_ID_CALL);
+
+	return BCCIM_WaitResponse(Interface, MBOX_C_A);
 }
 // ----------------------------------------
 
