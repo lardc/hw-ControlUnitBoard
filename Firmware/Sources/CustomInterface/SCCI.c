@@ -72,9 +72,11 @@ static void SCCI_SendResponseFrameEx(pSCCI_Interface Interface, Int16U Node, Int
 //
 static void SCCI_HandleRead16(pSCCI_Interface Interface);
 static void SCCI_HandleRead32(pSCCI_Interface Interface);
+static void SCCI_HandleReadFloat(pSCCI_Interface Interface);
 static void SCCI_HandleRead16Double(pSCCI_Interface Interface);
 static void SCCI_HandleWrite16(pSCCI_Interface Interface);
 static void SCCI_HandleWrite32(pSCCI_Interface Interface);
+static void SCCI_HandleWriteFloat(pSCCI_Interface Interface);
 static void SCCI_HandleWrite16Double(pSCCI_Interface Interface);
 static void SCCI_HandleReadBlock16(pSCCI_Interface Interface, Boolean Repeat);
 static void SCCI_HandleWriteBlock16(pSCCI_Interface Interface);
@@ -556,6 +558,12 @@ static void SCCI_HandleRead32(pSCCI_Interface Interface)
 }
 // ----------------------------------------
 
+static void SCCI_HandleReadFloat(pSCCI_Interface Interface)
+{
+	return;
+}
+// ----------------------------------------
+
 static void SCCI_HandleWrite16(pSCCI_Interface Interface)
 {
 	Int16U node = Interface->MessageBuffer[0] & 0xFF;
@@ -633,6 +641,12 @@ static void SCCI_HandleWrite32(pSCCI_Interface Interface)
 		else
 			SCCI_AnswerError(Interface, node, err, BCCIM_GetSavedErrorDetails());
 	}
+}
+// ----------------------------------------
+
+static void SCCI_HandleWriteFloat(pSCCI_Interface Interface)
+{
+	return;
 }
 // ----------------------------------------
 

@@ -150,29 +150,39 @@ Int16U BCCIM_Read16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pIn
 }
 // ----------------------------------------
 
-Int16U BCCIM_Read32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pInt32U Data)
+Int16U BCCIM_Read32bitTemplate(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pInt32U Data,
+	Int16U Mailbox, Int16U MailboxAnswer, Int16U CANID)
 {
 	Int16U ret;
 	CANMessage message;
 
 	Interface->IOConfig->IO_GetMessage(MBOX_ERR_A, NULL);
-	Interface->IOConfig->IO_GetMessage(MBOX_R_32_A, NULL);
+	Interface->IOConfig->IO_GetMessage(MailboxAnswer, NULL);
 	
 	message.HIGH.WORD.WORD_0 = Address;
-	BCCIM_SendFrame(Interface, MBOX_R_32, &message, Node, CAN_ID_R_32);
+	BCCIM_SendFrame(Interface, Mailbox, &message, Node, CANID);
 	
-	ret = BCCIM_WaitResponse(Interface, MBOX_R_32_A);
+	ret = BCCIM_WaitResponse(Interface, MailboxAnswer);
 	if(ret == ERR_NO_ERROR)
 	{
-		Interface->IOConfig->IO_GetMessage(MBOX_R_32_A, &message);
+		Interface->IOConfig->IO_GetMessage(MailboxAnswer, &message);
 		if(Data)
-			*Data = (Int32U)message.HIGH.WORD.WORD_1 << 16 | message.LOW.WORD.WORD_2;
+			*Data = ((Int32U)message.HIGH.WORD.WORD_1) << 16 | message.LOW.WORD.WORD_2;
 	}
 
 	return ret;
+}
 
+Int16U BCCIM_Read32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pInt32U Data)
+{
+	return BCCIM_Read32bitTemplate(Interface, Node, Address, Data, MBOX_R_32, MBOX_R_32_A, CAN_ID_R_32);
 }
 // ----------------------------------------
+
+Int16U BCCIM_ReadFloat(pBCCIM_Interface Interface, Int16U Node, Int16U Address, pInt32U Data)
+{
+	return BCCIM_Read32bitTemplate(Interface, Node, Address, Data, MBOX_R_F, MBOX_R_F_A, CAN_ID_R_F);
+}
 
 Int16U BCCIM_Write16(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int16U Data)
 {
