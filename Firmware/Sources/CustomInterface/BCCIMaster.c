@@ -211,19 +211,32 @@ void BCCIM_WriteBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint
 }
 // ----------------------------------------
 
-Int16U BCCIM_Write32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int32U Data)
+Int16U BCCIM_Write32bitTemplate(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int32U Data,
+	Int16U Mailbox, Int16U MailboxAnswer, Int16U CANID)
 {
 	CANMessage message;
 
 	Interface->IOConfig->IO_GetMessage(MBOX_ERR_A, NULL);
-	Interface->IOConfig->IO_GetMessage(MBOX_W_32_A, NULL);
+	Interface->IOConfig->IO_GetMessage(MailboxAnswer, NULL);
 	
 	message.HIGH.WORD.WORD_0 = Address;
 	message.HIGH.WORD.WORD_1 = Data >> 16;
 	message.LOW.WORD.WORD_2 = Data & 0xFFFF;
-	BCCIM_SendFrame(Interface, MBOX_W_32, &message, Node, CAN_ID_W_32);
+	BCCIM_SendFrame(Interface, Mailbox, &message, Node, CANID);
 
-	return BCCIM_WaitResponse(Interface, MBOX_W_32_A);
+	return BCCIM_WaitResponse(Interface, MailboxAnswer);
+}
+// ----------------------------------------
+
+Int16U BCCIM_Write32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int32U Data)
+{
+	return BCCIM_Write32bitTemplate(Interface, Node, Address, Data, MBOX_W_32, MBOX_W_32_A, CAN_ID_W_32);
+}
+// ----------------------------------------
+
+Int16U BCCIM_WriteFloat(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int32U Data)
+{
+	return BCCIM_Write32bitTemplate(Interface, Node, Address, Data, MBOX_W_F, MBOX_W_F_A, CAN_ID_W_F);
 }
 // ----------------------------------------
 
