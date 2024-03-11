@@ -89,8 +89,6 @@ static void SCCI_HandleCall(pSCCI_Interface Interface);
 // Variables
 //
 static Int16U ZeroBuffer[xCCI_BUFFER_SIZE] = {0};
-static pInt16U SavedDataBufferRBF16 = ZeroBuffer;
-static Int16U SavedDataBufferSizeRBF16 = 0;
 static Boolean SCCIActive = FALSE;
 
 // Functions
@@ -223,12 +221,9 @@ void SCCI_AnswerWrite16Double(pSCCI_Interface Interface, Int16U Node, Int16U Add
 	SCCI_SendResponseFrameEx(Interface, Node, FUNCTION_WRITE, SFUNC_16_2, 5);
 }
 
-void SCCI_AnswerWriteBlock16(pSCCI_Interface Interface, Int16U Node, pInt16U Data)
+void SCCI_AnswerWriteBlock16(pSCCI_Interface Interface, Int16U Node, Int16U Endpoint)
 {
-	Interface->MessageBuffer[2] = (*Data) & 0xFFFF;
-	Interface->MessageBuffer[3] = *(Data + 1);
-	Interface->MessageBuffer[4] = *(Data + 2);
-	Interface->MessageBuffer[5] = *(Data + 3);
+	Interface->MessageBuffer[2] = Endpoint;
 
 	SCCI_SendResponseFrameEx(Interface, Node, FUNCTION_WRITE_BLOCK, SFUNC_16, 4);
 }
@@ -257,9 +252,6 @@ void SCCI_AnswerCall(pSCCI_Interface Interface, Int16U Node, Int16U Action)
 
 void SCCI_AnswerReadBlock16Fast(pSCCI_Interface Interface, Int16U Node, Int16U Endpoint, pInt16U Data, Int16U DataSize)
 {
-	SavedDataBufferRBF16 = Data;
-	SavedDataBufferSizeRBF16 = DataSize;
-
 	Interface->MessageBuffer[2] = (Endpoint << 8) | (SCCI_USE_CRC_IN_STREAM ? 1 : 0);
 
 	if(!DataSize || (DataSize > xCCI_BLOCK_STM_MAX_VAL))
@@ -867,7 +859,14 @@ static void SCCI_HandleWriteBlock16(pSCCI_Interface Interface)
 	}
 	else
 	{
-		BCCIM_WriteBlock16(&DEVICE_CAN_Interface, node, epnt, &Interface->MessageBuffer[3], length);
+		
+		Int16U err = BCCIM_WriteBlock16(&DEVICE_CAN_Interface, node, epnt, &Interface->MessageBuffer[3], length);
+
+		if(err == ERR_NO_ERROR)
+			SCCI_AnswerWriteBlock16(Interface, node, epnt);
+		else
+			SCCI_AnswerError(Interface, node, err, BCCIM_GetSavedErrorDetails());
+
 	}
 }
 // ----------------------------------------
@@ -905,12 +904,12 @@ static void SCCI_HandleReadBlockFast16(pSCCI_Interface Interface, Boolean Repeat
 	}
 	else
 	{
-		if(!Repeat)
-		{
-			BCCIM_ReadBlock16(&DEVICE_CAN_Interface, node, epnt, TRUE);
-		}
+		Int16U err = BCCIM_ReadBlock16(&DEVICE_CAN_Interface, node, epnt);
+
+		if(err == ERR_NO_ERROR)
+			SCCI_AnswerReadBlock16Fast(Interface, node, epnt, BCCIM_ReadBlock16Buffer, BCCIM_ReadBlockBufferCounter);
 		else
-			SCCI_AnswerReadBlock16Fast(Interface, node, epnt, SavedDataBufferRBF16, SavedDataBufferSizeRBF16);
+			SCCI_AnswerError(Interface, node, err, BCCIM_GetSavedErrorDetails());
 	}
 }
 // ----------------------------------------
