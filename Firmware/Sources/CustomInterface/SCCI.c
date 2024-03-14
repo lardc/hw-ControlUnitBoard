@@ -89,7 +89,6 @@ static void SCCI_HandleCall(pSCCI_Interface Interface);
 // Variables
 //
 static Int16U ZeroBuffer[xCCI_BUFFER_SIZE] = {0};
-static Boolean SCCIActive = FALSE;
 
 // Functions
 //
@@ -427,11 +426,6 @@ static void SCCI_DispatchBody(pSCCI_Interface Interface, Boolean MaskStateChange
 		SCCI_SendErrorFrame(Interface, ERR_BLOCKED, 0);
 		return;
 	}
-
-	if(SCCIActive)
-		++DataTable[REG_OVERLAP_COUNT_REQ];
-	else
-		SCCIActive = TRUE;
 
 	switch (Interface->DispID)
 	{
@@ -973,10 +967,6 @@ static void SCCI_SendResponseFrame(pSCCI_Interface Interface, Int16U FrameSize)
 	Interface->MessageBuffer[1] |= RESPONSE_MASK << 8;
 	Interface->MessageBuffer[FrameSize - 1] = CRC16_ComputeCRC(Interface->MessageBuffer, FrameSize - 1);
 
-	if(SCCIActive)
-		SCCIActive = FALSE;
-	else
-		++DataTable[REG_OVERLAP_COUNT_RESP];
 	Interface->IOConfig->IO_SendArray16(Interface->MessageBuffer, FrameSize);
 }
 // ----------------------------------------
@@ -990,10 +980,6 @@ static void SCCI_SendResponseFrameEx(pSCCI_Interface Interface, Int16U Node, Int
 	Interface->MessageBuffer[1] = (RESPONSE_MASK | (Function << 3) | SubFunction) << 8;
 	Interface->MessageBuffer[FrameSize - 1] = CRC16_ComputeCRC(Interface->MessageBuffer, FrameSize - 1);
 
-	if(SCCIActive)
-		SCCIActive = FALSE;
-	else
-		++DataTable[REG_OVERLAP_COUNT_RESP];
 	Interface->IOConfig->IO_SendArray16(Interface->MessageBuffer, FrameSize);
 }
 // ----------------------------------------

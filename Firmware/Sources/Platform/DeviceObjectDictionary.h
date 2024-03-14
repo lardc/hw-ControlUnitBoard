@@ -40,9 +40,6 @@
 #define REG_SENSOR_3				199	//
 #define REG_SENSOR_4				200	//
 //
-#define REG_OVERLAP_COUNT_REQ		210	// Overlapping requests via SCCI interface
-#define REG_OVERLAP_COUNT_RESP		211	// Overlapping responses via SCCI interface
-//
 #define REG_CAN_BUSOFF_COUNTER		220 // Counter of bus-off states
 #define REG_CAN_STATUS_REG			221	// CAN status register (32 bit)
 #define REG_CAN_STATUS_REG_32		222
