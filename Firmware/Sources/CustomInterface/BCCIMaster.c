@@ -14,11 +14,11 @@
 // Macro
 //
 #define CAN_ID_W_16					10
-#define CAN_ID_W_F					12
 #define CAN_ID_W_32					14
+#define CAN_ID_W_F					16
 #define CAN_ID_R_16					20
-#define CAN_ID_R_F					22
 #define CAN_ID_R_32					24
+#define CAN_ID_R_F					26
 #define CAN_ID_WB_16				30
 #define CAN_ID_RB_16				40
 #define CAN_ID_CALL					50
@@ -69,7 +69,6 @@ Int16U BCCIM_ReadBlock16Buffer[READ_BLOCK_16_BUFFER_SIZE + 4];
 Int16U BCCIM_ReadBlockBufferCounter = 0;
 //
 static Int16U ReadBlockSavedEndpoint, ReadBlockSavedNode;
-static pSCCI_Interface ActiveSCCI;
 static Int16U SavedErrorDetails = 0;
 
 // Functions
@@ -110,21 +109,6 @@ void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig, Int32U Mess
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_WB_16_A, CAN_ID_WB_16 + 1, TRUE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
 
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_ERR_A, CAN_ID_ERR, TRUE, 4, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
-}
-// ----------------------------------------
-
-void BCCIM_Process(pBCCIM_Interface Interface)
-{
-	if(Interface->IOConfig->IO_IsMessageReceived(MBOX_WB_16_A, NULL)) { BCCIM_HandleWriteBlock16(Interface); return; }
-	if(Interface->IOConfig->IO_IsMessageReceived(MBOX_R_16_A, NULL)) { BCCIM_HandleRead16(Interface); return; }
-	if(Interface->IOConfig->IO_IsMessageReceived(MBOX_R_F_A, NULL)) { BCCIM_HandleRead16Double(Interface); return; }
-	if(Interface->IOConfig->IO_IsMessageReceived(MBOX_R_32_A, NULL)) { BCCIM_HandleRead32(Interface); return; }
-	if(Interface->IOConfig->IO_IsMessageReceived(MBOX_W_16_A, NULL)) { BCCIM_HandleWrite16(Interface); return; }
-	if(Interface->IOConfig->IO_IsMessageReceived(MBOX_W_F_A, NULL)) { BCCIM_HandleWrite16Double(Interface); return; }
-	if(Interface->IOConfig->IO_IsMessageReceived(MBOX_W_32_A, NULL)) { BCCIM_HandleWrite32(Interface); return; }
-	if(Interface->IOConfig->IO_IsMessageReceived(MBOX_C_A, NULL)) { BCCIM_HandleCall(Interface); return; }
-	if(Interface->IOConfig->IO_IsMessageReceived(MBOX_RB_16_A, NULL)) { BCCIM_HandleReadBlock16(Interface); return; }
-	if(Interface->IOConfig->IO_IsMessageReceived(MBOX_ERR_A, NULL)) { BCCIM_HandleError(Interface); return; }
 }
 // ----------------------------------------
 

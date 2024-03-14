@@ -39,8 +39,8 @@ enum DispID
 	DISP_C = 10,
 	DISP_RBF_16 = 11,
 	DISP_RRBF_16 = 12,
-	DISP_R_F = 13,
-	DISP_W_F = 14
+	DISP_R_F = 15,
+	DISP_W_F = 16
 };
 //
 enum SCCI_FunctionCodes
@@ -60,7 +60,7 @@ enum SCCI_SubFunctionCodes
 	SFUNC_32 = 2,
 	SFUNC_16_2 = 3,
 	SFUNC_REP_16 = 3,
-	SFUNC_FLOAT = 4
+	SFUNC_FLOAT = 5
 };
 
 // Forward functions
