@@ -40,6 +40,11 @@
 #define REG_SENSOR_3				199	//
 #define REG_SENSOR_4				200	//
 //
+// Отладка получаемых команд по RS232. Параметры последнего полученного пакета
+#define REG_DIAG_RS232_NODE			201	// Номер узла
+#define REG_DIAG_RS232_FUNC_CODE	202	// Код функции
+#define REG_DIAG_RS232_ADDRESS		203	// Адрес команды
+//
 #define REG_CAN_BUSOFF_COUNTER		220 // Counter of bus-off states
 #define REG_CAN_STATUS_REG			221	// CAN status register (32 bit)
 #define REG_CAN_STATUS_REG_32		222

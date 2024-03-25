@@ -427,6 +427,10 @@ static void SCCI_DispatchBody(pSCCI_Interface Interface, Boolean MaskStateChange
 		return;
 	}
 
+	DataTable[REG_DIAG_RS232_NODE] = Interface->MessageBuffer[0] & 0xFF;
+	DataTable[REG_DIAG_RS232_FUNC_CODE] = Interface->DispID;
+	DataTable[REG_DIAG_RS232_ADDRESS] = Interface->MessageBuffer[2];
+
 	switch (Interface->DispID)
 	{
 		case DISP_R_16:
