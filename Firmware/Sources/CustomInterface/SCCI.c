@@ -132,42 +132,93 @@ void SCCI_Init(pSCCI_Interface Interface, pSCCI_IOConfig IOConfig, pxCCI_Service
 
 void SCCI_Process(pSCCI_Interface Interface, Int64U CurrentTickCount, Boolean MaskStateChangeOperations)
 {
-	switch (Interface->State)
+	switch(Interface->State)
 	{
 		case SCCI_STATE_WAIT_STARTBYTE:
-			if(Interface->IOConfig->IO_GetBytesToReceive() > 0)
+			while(Interface->IOConfig->IO_GetBytesToReceive())
 			{
 				Int16U startByte = Interface->IOConfig->IO_ReceiveByte();
 				LOG_SaveValues(&startByte, 1);
 
 				if(startByte == START_BYTE)
-					Interface->State = SCCI_STATE_WAIT_HEADER;
+				{
+					Interface->State = SCCI_STATE_WAIT_NID;
+					Interface->LastTimestampTicks = CurrentTickCount + Interface->TimeoutValueTicks;
+
+					if(Interface->IOConfig->IO_GetBytesToReceive())
+						goto GOTO_PROCESS_NID;
+					else
+						break;
+				}
 			}
 			break;
-		case SCCI_STATE_WAIT_HEADER:
-			if(Interface->IOConfig->IO_GetBytesToReceive() >= 3)
-			{
-				Int16U nextByte = Interface->IOConfig->IO_ReceiveByte();
-				Interface->MessageBuffer[0] = nextByte | (START_BYTE << 8);
 
-				Interface->IOConfig->IO_ReceiveArray16(Interface->MessageBuffer + 1, 1);
-				LOG_SaveValues(Interface->MessageBuffer, 2);
+		case SCCI_STATE_WAIT_NID:
+			if(Interface->IOConfig->IO_GetBytesToReceive() > 0)
+			{
+				GOTO_PROCESS_NID:;
+
+				Int16U NodeID = Interface->IOConfig->IO_ReceiveByte();
+				LOG_SaveValues(&NodeID, 1);
+
+				Interface->MessageBuffer[0] = NodeID | (START_BYTE << 8);
+				Interface->State = SCCI_STATE_WAIT_HEADER;
+
+				if(Interface->IOConfig->IO_GetBytesToReceive())
+					goto GOTO_PROCESS_HEADER;
+			}
+			break;
+
+		case SCCI_STATE_WAIT_HEADER:
+			if(Interface->IOConfig->IO_GetBytesToReceive() > 0)
+			{
+				GOTO_PROCESS_HEADER:;
+
+				Int16U funcCode = Interface->IOConfig->IO_ReceiveByte();
+				LOG_SaveValues(&funcCode, 1);
+
+				Interface->MessageBuffer[1] = funcCode << 8;
+				Interface->State = SCCI_STATE_WAIT_DUMMY;
 				SCCI_DispatchHeader(Interface);
 
-				if(Interface->State == SCCI_STATE_WAIT_BODY)
-					Interface->LastTimestampTicks = CurrentTickCount + Interface->TimeoutValueTicks;
+				if(Interface->IOConfig->IO_GetBytesToReceive())
+					goto GOTO_PROCESS_DUMMY;
 			}
 			break;
+
+		case SCCI_STATE_WAIT_DUMMY:
+			if(Interface->IOConfig->IO_GetBytesToReceive() > 0)
+			{
+				GOTO_PROCESS_DUMMY:;
+
+				Int16U dummy = Interface->IOConfig->IO_ReceiveByte();
+				LOG_SaveValues(&dummy, 1);
+
+				Interface->MessageBuffer[1] |= dummy;
+				Interface->State = SCCI_STATE_WAIT_BODY;
+
+				if(Interface->IOConfig->IO_GetBytesToReceive() >= Interface->ExpectedBodyLength)
+					goto GOTO_PROCESS_BODY;
+			}
+			break;
+
 		case SCCI_STATE_WAIT_BODY:
 			if(Interface->IOConfig->IO_GetBytesToReceive() >= Interface->ExpectedBodyLength)
 			{
+				GOTO_PROCESS_BODY:;
+
 				Interface->IOConfig->IO_ReceiveArray16(Interface->MessageBuffer + 2, Interface->ExpectedBodyLength);
 				LOG_SaveValues(Interface->MessageBuffer + 2, Interface->ExpectedBodyLength);
 				SCCI_DispatchBody(Interface, MaskStateChangeOperations);
 			}
-			else if(Interface->TimeoutValueTicks && (CurrentTickCount > Interface->LastTimestampTicks))
-				SCCI_SendErrorFrame(Interface, ERR_TIMEOUT, CurrentTickCount - Interface->LastTimestampTicks);
 			break;
+	}
+
+	if(Interface->TimeoutValueTicks && Interface->State != SCCI_STATE_WAIT_STARTBYTE
+			&& CurrentTickCount > Interface->LastTimestampTicks)
+	{
+		SCCI_SendErrorFrame(Interface, ERR_TIMEOUT, Interface->State);
+		Interface->State = SCCI_STATE_WAIT_STARTBYTE;
 	}
 }
 // ----------------------------------------
