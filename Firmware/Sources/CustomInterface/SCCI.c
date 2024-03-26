@@ -431,9 +431,17 @@ static void SCCI_DispatchBody(pSCCI_Interface Interface, Boolean MaskStateChange
 		return;
 	}
 
-	DataTable[REG_DIAG_RS232_NODE] = Interface->MessageBuffer[0] & 0xFF;
-	DataTable[REG_DIAG_RS232_FUNC_CODE] = Interface->DispID;
-	DataTable[REG_DIAG_RS232_ADDRESS] = Interface->MessageBuffer[2];
+	Int16U node, func, addr;
+	node = Interface->MessageBuffer[0] & 0xFF;
+	func = Interface->DispID;
+	addr = Interface->MessageBuffer[2];
+
+	if(!(node == 0 && func == DISP_R_16 && REG_DIAG_RS232_NODE <= addr && addr <= REG_DIAG_RS232_ADDRESS))
+	{
+		DataTable[REG_DIAG_RS232_NODE] = node;
+		DataTable[REG_DIAG_RS232_FUNC_CODE] = func;
+		DataTable[REG_DIAG_RS232_ADDRESS] = addr;
+	}
 
 	switch (Interface->DispID)
 	{
