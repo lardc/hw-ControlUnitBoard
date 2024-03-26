@@ -14,6 +14,7 @@
 #include "DataTable.h"
 #include "DeviceObjectDictionary.h"
 #include "Global.h"
+#include "Logger.h"
 
 // Macro
 //
@@ -137,6 +138,7 @@ void SCCI_Process(pSCCI_Interface Interface, Int64U CurrentTickCount, Boolean Ma
 			if(Interface->IOConfig->IO_GetBytesToReceive() > 0)
 			{
 				Int16U startByte = Interface->IOConfig->IO_ReceiveByte();
+				LOG_SaveValues(&startByte, 1);
 
 				if(startByte == START_BYTE)
 					Interface->State = SCCI_STATE_WAIT_HEADER;
@@ -149,6 +151,7 @@ void SCCI_Process(pSCCI_Interface Interface, Int64U CurrentTickCount, Boolean Ma
 				Interface->MessageBuffer[0] = nextByte | (START_BYTE << 8);
 
 				Interface->IOConfig->IO_ReceiveArray16(Interface->MessageBuffer + 1, 1);
+				LOG_SaveValues(Interface->MessageBuffer, 2);
 				SCCI_DispatchHeader(Interface);
 
 				if(Interface->State == SCCI_STATE_WAIT_BODY)
@@ -159,6 +162,7 @@ void SCCI_Process(pSCCI_Interface Interface, Int64U CurrentTickCount, Boolean Ma
 			if(Interface->IOConfig->IO_GetBytesToReceive() >= Interface->ExpectedBodyLength)
 			{
 				Interface->IOConfig->IO_ReceiveArray16(Interface->MessageBuffer + 2, Interface->ExpectedBodyLength);
+				LOG_SaveValues(Interface->MessageBuffer + 2, Interface->ExpectedBodyLength);
 				SCCI_DispatchBody(Interface, MaskStateChangeOperations);
 			}
 			else if(Interface->TimeoutValueTicks && (CurrentTickCount > Interface->LastTimestampTicks))

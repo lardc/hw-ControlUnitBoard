@@ -45,6 +45,8 @@
 #define REG_DIAG_RS232_FUNC_CODE	202	// Код функции
 #define REG_DIAG_RS232_ADDRESS		203	// Адрес команды
 //
+#define REG_DIAG_ARRAY_LAST_VAL		205	// Указатель на последний записанный элемент данных RS232
+//
 #define REG_CAN_BUSOFF_COUNTER		220 // Counter of bus-off states
 #define REG_CAN_STATUS_REG			221	// CAN status register (32 bit)
 #define REG_CAN_STATUS_REG_32		222
