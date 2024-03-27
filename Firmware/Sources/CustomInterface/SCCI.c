@@ -154,7 +154,7 @@ void SCCI_Process(pSCCI_Interface Interface, Int64U CurrentTickCount, Boolean Ma
 			break;
 
 		case SCCI_STATE_WAIT_NID:
-			if(Interface->IOConfig->IO_GetBytesToReceive() > 0)
+			if(Interface->IOConfig->IO_GetBytesToReceive())
 			{
 				GOTO_PROCESS_NID:;
 
@@ -164,46 +164,28 @@ void SCCI_Process(pSCCI_Interface Interface, Int64U CurrentTickCount, Boolean Ma
 				Interface->MessageBuffer[0] = NodeID | (START_BYTE << 8);
 				Interface->State = SCCI_STATE_WAIT_HEADER;
 
-				if(Interface->IOConfig->IO_GetBytesToReceive())
+				if(Interface->IOConfig->IO_GetBytesToReceive() >= 2)
 					goto GOTO_PROCESS_HEADER;
 			}
 			break;
 
 		case SCCI_STATE_WAIT_HEADER:
-			if(Interface->IOConfig->IO_GetBytesToReceive() > 0)
+			if(Interface->IOConfig->IO_GetBytesToReceive() >= 2)
 			{
 				GOTO_PROCESS_HEADER:;
 
-				Int16U funcCode = Interface->IOConfig->IO_ReceiveByte();
-				LOG_SaveValues(&funcCode, 1);
-
-				Interface->MessageBuffer[1] = funcCode << 8;
-				Interface->State = SCCI_STATE_WAIT_DUMMY;
+				Interface->IOConfig->IO_ReceiveArray16(Interface->MessageBuffer + 1, 1);
+				LOG_SaveValues(Interface->MessageBuffer + 1, 1);
 				SCCI_DispatchHeader(Interface);
 
-				if(Interface->IOConfig->IO_GetBytesToReceive())
-					goto GOTO_PROCESS_DUMMY;
-			}
-			break;
-
-		case SCCI_STATE_WAIT_DUMMY:
-			if(Interface->IOConfig->IO_GetBytesToReceive() > 0)
-			{
-				GOTO_PROCESS_DUMMY:;
-
-				Int16U dummy = Interface->IOConfig->IO_ReceiveByte();
-				LOG_SaveValues(&dummy, 1);
-
-				Interface->MessageBuffer[1] |= dummy;
-				Interface->State = SCCI_STATE_WAIT_BODY;
-
-				if(Interface->IOConfig->IO_GetBytesToReceive() >= Interface->ExpectedBodyLength)
+				if(Interface->State == SCCI_STATE_WAIT_BODY
+						&& Interface->IOConfig->IO_GetBytesToReceive() >= Interface->ExpectedBodyLength * 2)
 					goto GOTO_PROCESS_BODY;
 			}
 			break;
 
 		case SCCI_STATE_WAIT_BODY:
-			if(Interface->IOConfig->IO_GetBytesToReceive() >= Interface->ExpectedBodyLength)
+			if(Interface->IOConfig->IO_GetBytesToReceive() >= Interface->ExpectedBodyLength * 2)
 			{
 				GOTO_PROCESS_BODY:;
 
