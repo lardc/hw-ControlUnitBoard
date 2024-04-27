@@ -13,6 +13,7 @@
 
 // Variables
 extern Int16U	BCCIM_ReadBlock16Buffer[];
+extern pInt32U	BCCIM_ReadBlockFloatBuffer;
 extern Int16U	BCCIM_ReadBlockBufferCounter;
 
 // Types
@@ -40,6 +41,7 @@ Int16U BCCIM_Write32(pBCCIM_Interface Interface, Int16U Node, Int16U Address, In
 Int16U BCCIM_WriteFloat(pBCCIM_Interface Interface, Int16U Node, Int16U Address, Int32U Data);
 Int16U BCCIM_Call(pBCCIM_Interface Interface, Int16U Node, Int16U Action);
 Int16U BCCIM_ReadBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint);
+Int16U BCCIM_ReadBlockFloat(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint);
 
 Int16U BCCIM_GetSavedErrorDetails();
 

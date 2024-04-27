@@ -76,6 +76,7 @@ void SCCI_AnswerWrite32(pSCCI_Interface Interface, Int16U Node, Int16U Address);
 void SCCI_AnswerWriteFloat(pSCCI_Interface Interface, Int16U Node, Int16U Address);
 void SCCI_AnswerCall(pSCCI_Interface Interface, Int16U Node, Int16U Action);
 void SCCI_AnswerReadBlock16Fast(pSCCI_Interface Interface, Int16U Node, Int16U Endpoint, pInt16U Data, Int16U DataSize);
+void SCCI_AnswerReadBlockFloatFast(pSCCI_Interface Interface, Int16U Node, Int16U Endpoint, pInt32U Data, Int16U DataSize);
 void SCCI_AnswerError(pSCCI_Interface Interface, Int16U Node, Int16U ErrorCode, Int16U Details);
 
 // Inline functions

@@ -21,6 +21,7 @@
 #define CAN_ID_R_F					26
 #define CAN_ID_WB_16				30
 #define CAN_ID_RB_16				40
+#define CAN_ID_RB_F					42
 #define CAN_ID_CALL					50
 #define CAN_ID_ERR					61
 //
@@ -43,21 +44,27 @@
 #define MBOX_RB_16_A				17
 #define MBOX_WB_16					19
 #define MBOX_WB_16_A				20
+#define MBOX_RB_F					21
+#define MBOX_RB_F_A					22
 //
-#define READ_BLOCK_16_BUFFER_SIZE	8000
+#define READ_BLOCK_FLOAT_BUFFER_SIZE	4000
+#define READ_BLOCK_16_BUFFER_SIZE		(READ_BLOCK_FLOAT_BUFFER_SIZE * 2)
 
 // Forward functions
 //
 static Boolean BCCIM_HandleReadBlock16(pBCCIM_Interface Interface);
 void BCCIM_ReadBlock16Subfunction(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint, Boolean Start);
+void BCCIM_ReadBlockFloatSubfunction(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint, Boolean Start);
+Boolean BCCIM_HandleReadBlockFloat(pBCCIM_Interface Interface);
 Int16U BCCIM_WaitResponse(pBCCIM_Interface Interface, Int16U Mailbox);
 //
 static void BCCIM_SendFrame(pBCCIM_Interface Interface, Int16U Mailbox, pCANMessage Message, Int32U Node,
 		Int16U Command);
 //
 #pragma DATA_SECTION(BCCIM_ReadBlock16Buffer, "data_mem");
-Int16U BCCIM_ReadBlock16Buffer[READ_BLOCK_16_BUFFER_SIZE + 4];
-Int16U BCCIM_ReadBlockBufferCounter = 0;
+Int16U  BCCIM_ReadBlock16Buffer[READ_BLOCK_16_BUFFER_SIZE + 4];
+pInt32U BCCIM_ReadBlockFloatBuffer = (pInt32U)BCCIM_ReadBlock16Buffer;
+Int16U  BCCIM_ReadBlockBufferCounter = 0;
 //
 static Int16U ReadBlockSavedEndpoint, ReadBlockSavedNode;
 static Int16U SavedErrorDetails = 0;
@@ -98,6 +105,9 @@ void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig, Int32U Mess
 
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_WB_16, CAN_ID_WB_16, FALSE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_WB_16_A, CAN_ID_WB_16 + 1, TRUE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
+
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_F, CAN_ID_RB_F, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_F_A, CAN_ID_RB_F + 1, TRUE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
 
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_ERR_A, CAN_ID_ERR, TRUE, 4, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
 }
@@ -322,6 +332,74 @@ Boolean BCCIM_HandleReadBlock16(pBCCIM_Interface Interface)
 }
 // ----------------------------------------
 
+Int16U BCCIM_ReadBlockFloat(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint)
+{
+	Int16U ret;
+	Int64U timeout;
+	BCCIM_ReadBlockFloatSubfunction(Interface, Node, Endpoint, TRUE);
+
+	timeout = Interface->TimeoutValueTicks + *(Interface->pTimerCounter);
+	while(*(Interface->pTimerCounter) < timeout)
+	{
+		// Get response
+		if ((ret = BCCIM_WaitResponse(Interface, MBOX_RB_F_A)) == ERR_NO_ERROR)
+		{
+			if (BCCIM_HandleReadBlockFloat(Interface))
+				return ERR_NO_ERROR;
+		}
+		else
+			return ret;
+	}
+
+	return ERR_TIMEOUT;
+}
+// ----------------------------------------
+
+void BCCIM_ReadBlockFloatSubfunction(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint, Boolean Start)
+{
+	CANMessage message;
+
+	if(Start)
+	{
+		// Clear input mailboxes
+		Interface->IOConfig->IO_GetMessage(MBOX_ERR_A, NULL);
+		Interface->IOConfig->IO_GetMessage(MBOX_RB_F_A, NULL);
+
+		ReadBlockSavedEndpoint = Endpoint;
+		ReadBlockSavedNode = Node;
+		BCCIM_ReadBlockBufferCounter = 0;
+	}
+
+	message.HIGH.WORD.WORD_0 = ReadBlockSavedEndpoint;
+	BCCIM_SendFrame(Interface, MBOX_RB_F, &message, ReadBlockSavedNode, CAN_ID_RB_F);
+}
+// ----------------------------------------
+
+Boolean BCCIM_HandleReadBlockFloat(pBCCIM_Interface Interface)
+{
+	CANMessage CANInput;
+	Interface->IOConfig->IO_GetMessage(MBOX_RB_F_A, &CANInput);
+
+	if(BCCIM_ReadBlockBufferCounter >= READ_BLOCK_FLOAT_BUFFER_SIZE)
+		return TRUE;
+
+	Int16U length = CANInput.DLC / 4;
+	switch(length)
+	{
+		case 2:
+			BCCIM_ReadBlockFloatBuffer[BCCIM_ReadBlockBufferCounter + 1] = CANInput.LOW.DWORD_1;
+		case 1:
+			BCCIM_ReadBlockFloatBuffer[BCCIM_ReadBlockBufferCounter] = CANInput.HIGH.DWORD_0;
+
+			BCCIM_ReadBlockBufferCounter += length;
+			BCCIM_ReadBlockFloatSubfunction(Interface, 0, 0, FALSE);
+			return FALSE;
+		default:
+			return TRUE;
+	}
+}
+// ----------------------------------------
+
 static void BCCIM_SendFrame(pBCCIM_Interface Interface, Int16U Mailbox, pCANMessage Message, Int32U Node,
 		Int16U Command)
 {
@@ -358,4 +436,4 @@ Int16U BCCIM_GetSavedErrorDetails()
 {
 	return SavedErrorDetails;
 }
-// No more.
+// ----------------------------------------
