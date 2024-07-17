@@ -42,11 +42,8 @@
 
 // TIMERs
 //--------------------------------------------------------
-#define CS_T0_FREQ			1000	// 1 KHz
-#define CS_T2_FREQ			1000	// 1 KHz
-
-#define TIMER0_PERIOD		(1000000L / CS_T0_FREQ)
-#define TIMER2_PERIOD		(1000000L / CS_T2_FREQ)
+#define TIMER2_FREQ			1000	// in KHz
+#define TIMER2_PERIOD		(1000000L / TIMER2_FREQ)
 
 #define DBG_FREQ			2		// 2 Hz
 #define DBG_COUNTER_PERIOD	(1000 / (DBG_FREQ * 2))

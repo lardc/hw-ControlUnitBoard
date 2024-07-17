@@ -20,8 +20,7 @@ volatile Int64U CONTROL_TimeCounter = 0;
 volatile DeviceState CONTROL_State = DS_None;
 static volatile Boolean CycleActive = FALSE;
 //
-#pragma DATA_SECTION(CONTROL_Values_1, "data_mem");
-Int16U CONTROL_Values_1[VALUES_x_SIZE];
+Int16U CONTROL_Values_1[VALUES_x_SIZE] = {0};
 volatile Int16U CONTROL_Values_1_Counter = 0;
 //
 // Boot-loader flag
