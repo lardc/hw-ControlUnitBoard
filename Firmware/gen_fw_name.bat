@@ -1,6 +1,8 @@
 @echo off
 setlocal
 
+del *.bin *.hex
+
 rem # If no arguments — go to file rename
 rem # else generate hex for TMS
 if "%~1"=="" goto blank
