@@ -24,6 +24,8 @@
 #define CAN_ID_RB_F					42
 #define CAN_ID_CALL					50
 #define CAN_ID_ERR					61
+#define CAN_ID_R_BP					70
+#define CAN_ID_A_BP					71
 //
 #define MBOX_W_16					1
 #define MBOX_W_16_A					2
@@ -46,6 +48,8 @@
 #define MBOX_WB_16_A				20
 #define MBOX_RB_F					21
 #define MBOX_RB_F_A					22
+#define MBOX_BP						23
+#define MBOX_BP_A					24
 //
 #define READ_BLOCK_FLOAT_BUFFER_SIZE	4000
 #define READ_BLOCK_16_BUFFER_SIZE		(READ_BLOCK_FLOAT_BUFFER_SIZE * 2)
@@ -108,6 +112,9 @@ void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig, Int32U Mess
 
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_F, CAN_ID_RB_F, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_F_A, CAN_ID_RB_F + 1, TRUE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
+
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_BP, CAN_ID_R_BP, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_BP_A, CAN_ID_A_BP, TRUE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
 
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_ERR_A, CAN_ID_ERR, TRUE, 4, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
 }
@@ -400,6 +407,12 @@ Boolean BCCIM_HandleReadBlockFloat(pBCCIM_Interface Interface)
 }
 // ----------------------------------------
 
+Int16U SendBroadcastFrame(pBCCIM_Interface Interface, pCANMessage Message)
+{
+	Interface->IOConfig->IO_SendMessageEx(MBOX_BP, Message, TRUE, FALSE);
+}
+// ----------------------------------------
+
 static void BCCIM_SendFrame(pBCCIM_Interface Interface, Int16U Mailbox, pCANMessage Message, Int32U Node,
 		Int16U Command)
 {
@@ -431,6 +444,37 @@ Int16U BCCIM_WaitResponse(pBCCIM_Interface Interface, Int16U Mailbox)
 	return ERR_TIMEOUT;
 }
 // ----------------------------------------
+
+Int16U BCCIM_WaitBroadcastResponse(pBCCIM_Interface Interface, pInt16U NodeArray, pInt16U NodeArraySize)
+{
+	Int64U timeout;
+	CANMessage message;
+	Int16U currentNodeCount = 0;
+
+	timeout = BR_TIMEOUT + *(Interface->pTimerCounter);
+
+	while (*(Interface->pTimerCounter) < timeout)
+	{
+		if (Interface->IOConfig->IO_IsMessageReceived(MBOX_ERR_A, NULL))
+		{
+			Interface->IOConfig->IO_GetMessage(MBOX_ERR_A, &message);
+			SavedErrorDetails = message.HIGH.WORD.WORD_1;
+			return message.HIGH.WORD.WORD_0;
+		}
+		else if (Interface->IOConfig->IO_IsMessageReceived(MBOX_BP_A, NULL))
+		{
+			Interface->IOConfig->IO_GetMessage(MBOX_BP_A, &message);
+			Int16U Node = message.MsgID.all >> 10;
+
+			NodeArray[currentNodeCount++] = Node;
+
+			// Обновляем таймаут на 10 мс от текущего значения счетчика
+			timeout = *(Interface->pTimerCounter) + BR_TIMEOUT;
+		}
+	}
+	*NodeArraySize = currentNodeCount;
+	return ERR_NO_ERROR;
+}
 
 Int16U BCCIM_GetSavedErrorDetails()
 {
