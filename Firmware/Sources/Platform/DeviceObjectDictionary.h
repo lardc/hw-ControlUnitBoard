@@ -9,6 +9,7 @@
 //
 #define ACT_RESET_STATE_MACHINE		10	// Reset state machine to default state
 //
+#define ACT_BROADCAST_PING			100	//
 #define ACT_SAVE_TO_ROM				200	// Save parameters to EEPROM module
 #define ACT_RESTORE_FROM_ROM		201	// Restore parameters from EEPROM module
 #define ACT_RESET_TO_DEFAULT		202	// Reset parameters to default values (only in controller memory)
@@ -67,6 +68,7 @@
 // ENDPOINTS
 //
 #define EP16_Data_1					1
+#define EP1_CAN_Nodes				2
 
 // PROBLEM CODES
 //

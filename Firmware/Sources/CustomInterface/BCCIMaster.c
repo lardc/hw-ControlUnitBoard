@@ -61,6 +61,7 @@ void BCCIM_ReadBlock16Subfunction(pBCCIM_Interface Interface, Int16U Node, Int16
 void BCCIM_ReadBlockFloatSubfunction(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint, Boolean Start);
 Boolean BCCIM_HandleReadBlockFloat(pBCCIM_Interface Interface);
 Int16U BCCIM_WaitResponse(pBCCIM_Interface Interface, Int16U Mailbox);
+Int16U BCCIM_WaitBroadcastResponse(pBCCIM_Interface Interface, pInt16U NodeArray, pInt16U NodeArraySize);
 //
 static void BCCIM_SendFrame(pBCCIM_Interface Interface, Int16U Mailbox, pCANMessage Message, Int32U Node,
 		Int16U Command);
@@ -407,9 +408,11 @@ Boolean BCCIM_HandleReadBlockFloat(pBCCIM_Interface Interface)
 }
 // ----------------------------------------
 
-Int16U SendBroadcastFrame(pBCCIM_Interface Interface, pCANMessage Message)
+Int16U BCCIM_SendBroadcastPing(pBCCIM_Interface Interface, pCANMessage Message, pInt16U NodeArray, pInt16U NodeArraySize)
 {
 	Interface->IOConfig->IO_SendMessageEx(MBOX_BP, Message, TRUE, FALSE);
+	Int16U ret = BCCIM_WaitBroadcastResponse(Interface, NodeArray, NodeArraySize);
+	return ret;
 }
 // ----------------------------------------
 
@@ -468,7 +471,6 @@ Int16U BCCIM_WaitBroadcastResponse(pBCCIM_Interface Interface, pInt16U NodeArray
 
 			NodeArray[currentNodeCount++] = Node;
 
-			// Обновляем таймаут на 10 мс от текущего значения счетчика
 			timeout = *(Interface->pTimerCounter) + BR_TIMEOUT;
 		}
 	}
