@@ -42,7 +42,7 @@ Int16U BCCIM_WriteFloat(pBCCIM_Interface Interface, Int16U Node, Int16U Address,
 Int16U BCCIM_Call(pBCCIM_Interface Interface, Int16U Node, Int16U Action);
 Int16U BCCIM_ReadBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint);
 Int16U BCCIM_ReadBlockFloat(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoint);
-Int16U BCCIM_SendBroadcastPing(pBCCIM_Interface Interface, pCANMessage Message, pInt16U NodeArray, pInt16U NodeArraySize);
+void BCCIM_SendBroadcastPing(pBCCIM_Interface Interface, pInt16U NodeArray, pInt16U NodeArraySize);
 
 Int16U BCCIM_GetSavedErrorDetails();
 
