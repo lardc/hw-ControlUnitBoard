@@ -39,10 +39,10 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError);
 void CONTROL_Init()
 {
 	// Variables for endpoint configuration
-	Int16U EPIndexes[EP_COUNT] = {EP1_CAN_Nodes, EP16_Data_1};
-	Int16U EPSized[EP_COUNT] = {MAX_NODE_COUNT, VALUES_x_SIZE};
-	pInt16U EPCounters[EP_COUNT] = {(pInt16U)&CONTROL_CAN_Nodes_Counter, (pInt16U)&CONTROL_Values_1_Counter};
-	pInt16U EPDatas[EP_COUNT] = {CONTROL_CAN_Nodes, CONTROL_Values_1};
+	Int16U EPIndexes[EP_COUNT] = {EP16_Data_1, EP16_CAN_Nodes};
+	Int16U EPSized[EP_COUNT] = {VALUES_x_SIZE, MAX_NODE_COUNT};
+	pInt16U EPCounters[EP_COUNT] = {(pInt16U)&CONTROL_Values_1_Counter, (pInt16U)&CONTROL_CAN_Nodes_Counter};
+	pInt16U EPDatas[EP_COUNT] = {CONTROL_Values_1, CONTROL_CAN_Nodes};
 	// Data-table EPROM service configuration
 	EPROMServiceConfig EPROMService = { &ZbMemory_WriteValuesEPROM, &ZbMemory_ReadValuesEPROM };
 	

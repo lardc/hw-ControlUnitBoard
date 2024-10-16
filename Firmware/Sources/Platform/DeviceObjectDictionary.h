@@ -68,7 +68,7 @@
 // ENDPOINTS
 //
 #define EP16_Data_1					1
-#define EP1_CAN_Nodes				2
+#define EP16_CAN_Nodes				2
 
 // PROBLEM CODES
 //
