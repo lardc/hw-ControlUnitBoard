@@ -23,6 +23,8 @@ static volatile Boolean CycleActive = FALSE;
 Int16U CONTROL_Values_1[VALUES_x_SIZE] = {0};
 volatile Int16U CONTROL_Values_1_Counter = 0;
 //
+Int16U CONTROL_CAN_Nodes[MAX_NODE_COUNT] = {0};
+volatile Int16U CONTROL_CAN_Nodes_Counter = 0;
 // Boot-loader flag
 #pragma DATA_SECTION(CONTROL_BootLoaderRequest, "bl_flag");
 volatile Int16U CONTROL_BootLoaderRequest = 0;
@@ -37,10 +39,10 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError);
 void CONTROL_Init()
 {
 	// Variables for endpoint configuration
-	Int16U EPIndexes[EP_COUNT] = {EP16_Data_1};
-	Int16U EPSized[EP_COUNT] = {VALUES_x_SIZE};
-	pInt16U EPCounters[EP_COUNT] = {(pInt16U)&CONTROL_Values_1_Counter};
-	pInt16U EPDatas[EP_COUNT] = {CONTROL_Values_1};
+	Int16U EPIndexes[EP_COUNT] = {EP16_Data_1, EP16_CAN_Nodes};
+	Int16U EPSized[EP_COUNT] = {VALUES_x_SIZE, MAX_NODE_COUNT};
+	pInt16U EPCounters[EP_COUNT] = {(pInt16U)&CONTROL_Values_1_Counter, (pInt16U)&CONTROL_CAN_Nodes_Counter};
+	pInt16U EPDatas[EP_COUNT] = {CONTROL_Values_1, CONTROL_CAN_Nodes};
 	// Data-table EPROM service configuration
 	EPROMServiceConfig EPROMService = { &ZbMemory_WriteValuesEPROM, &ZbMemory_ReadValuesEPROM };
 	
@@ -103,6 +105,12 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 
 		case ACT_BOOT_LOADER_REQUEST:
 			CONTROL_BootLoaderRequest = BOOT_LOADER_REQUEST;
+			break;
+
+		case ACT_BROADCAST_PING:
+			DEVPROFILE_ResetScopes(0);
+			DEVPROFILE_ResetEPReadState();
+			BCCIM_SendBroadcastPing(&DEVICE_CAN_Interface, CONTROL_CAN_Nodes, (pInt16U)&CONTROL_CAN_Nodes_Counter);
 			break;
 
 		default:
