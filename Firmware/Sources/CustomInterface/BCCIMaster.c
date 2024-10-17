@@ -411,7 +411,8 @@ Boolean BCCIM_HandleReadBlockFloat(pBCCIM_Interface Interface)
 void BCCIM_SendBroadcastPing(pBCCIM_Interface Interface, pInt16U NodeArray, pInt16U NodeArraySize)
 {
 	CANMessage message;
-	Interface->IOConfig->IO_SendMessageEx(MBOX_BP, &message, FALSE, FALSE);
+	message.MsgID.all = CAN_ID_R_BP;
+	Interface->IOConfig->IO_SendMessageEx(MBOX_BP, &message, TRUE, FALSE);
 	BCCIM_WaitBroadcastResponse(Interface, NodeArray, NodeArraySize);
 }
 // ----------------------------------------
