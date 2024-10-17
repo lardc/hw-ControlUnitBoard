@@ -114,7 +114,7 @@ void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig, Int32U Mess
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_F, CAN_ID_RB_F, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_F_A, CAN_ID_RB_F + 1, TRUE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
 
-	Interface->IOConfig->IO_ConfigMailbox(MBOX_BP, CAN_ID_R_BP, FALSE, 0, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_BP, CAN_ID_R_BP, FALSE, 0, ZW_CAN_MBProtected | ZW_CAN_UseExtendedID, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_BP_A, CAN_ID_A_BP, TRUE, 0, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
 
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_ERR_A, CAN_ID_ERR, TRUE, 4, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
@@ -411,8 +411,7 @@ Boolean BCCIM_HandleReadBlockFloat(pBCCIM_Interface Interface)
 void BCCIM_SendBroadcastPing(pBCCIM_Interface Interface, pInt16U NodeArray, pInt16U NodeArraySize)
 {
 	CANMessage message;
-	message.MsgID.all = CAN_ID_R_BP;
-	Interface->IOConfig->IO_SendMessageEx(MBOX_BP, &message, TRUE, FALSE);
+	Interface->IOConfig->IO_SendMessageEx(MBOX_BP, &message, FALSE, FALSE);
 	BCCIM_WaitBroadcastResponse(Interface, NodeArray, NodeArraySize);
 }
 // ----------------------------------------
