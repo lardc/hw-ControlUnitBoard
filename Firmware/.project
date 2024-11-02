@@ -331,6 +331,16 @@
 			<locationURI>PARENT-2-PROJECT_LOC/hw-TMS-libs/Library/_ZwXINT_Defs.h</locationURI>
 		</link>
 		<link>
+			<name>Sources/Platform/FirmwareInfo.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-TMS-libs/Firmware/FirmwareInfo.c</locationURI>
+		</link>
+		<link>
+			<name>Sources/Platform/FirmwareInfo.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-TMS-libs/Firmware/FirmwareInfo.h</locationURI>
+		</link>
+		<link>
 			<name>Sources/RTS/boot28.asm</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/hw-TMS-libs/RTS/boot28.asm</locationURI>
