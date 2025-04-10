@@ -109,7 +109,7 @@ void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig, Int32U Mess
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_16_A, CAN_ID_RB_16 + 1, TRUE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
 
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_WB_16, CAN_ID_WB_16, FALSE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
-	Interface->IOConfig->IO_ConfigMailbox(MBOX_WB_16_A, CAN_ID_WB_16 + 1, TRUE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_WB_16_A, CAN_ID_WB_16 + 1, TRUE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
 
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_F, CAN_ID_RB_F, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
 	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_F_A, CAN_ID_RB_F + 1, TRUE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, CAN_ACCEPTANCE_MASK);
