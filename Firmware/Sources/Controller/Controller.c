@@ -34,7 +34,6 @@ volatile Int16U CONTROL_BootLoaderRequest = 0;
 static void CONTROL_FillWPPartDefault();
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError);
 void CONTROL_InitCAN();
-void CONTROL_DeviceProfileInitWrapper();
 
 // Functions
 //
@@ -57,7 +56,8 @@ void CONTROL_Init()
 	CONTROL_FillWPPartDefault();
 	
 	// Device profile initialization
-	CONTROL_DeviceProfileInitWrapper();
+	Int16U NodeID = (DataTable[REG_CAN_NID] == 0xFFFF) ? 0 : DataTable[REG_CAN_NID];
+	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive, NodeID);
 	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
 	// Reset control values
 	DEVPROFILE_ResetControlSection();
@@ -108,8 +108,12 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			break;
 
 		case ACT_REINIT_CAN:
-			CONTROL_InitCAN();
-			CONTROL_DeviceProfileInitWrapper();
+			{
+				CONTROL_InitCAN();
+
+				Int16U NodeID = (DataTable[REG_CAN_NID] == 0xFFFF) ? 0 : DataTable[REG_CAN_NID];
+				DEVPROFILE_BCCIM_InitWrapper(NodeID);
+			}
 			break;
 
 		case ACT_BOOT_LOADER_REQUEST:
@@ -149,12 +153,5 @@ void CONTROL_InitCAN()
 	// Allow interrupts for CAN
 	ZwCANa_InitInterrupts(TRUE);
 	ZwCANa_EnableInterrupts(TRUE);
-}
-// -----------------------------------------
-
-void CONTROL_DeviceProfileInitWrapper()
-{
-	Int16U NodeID = (DataTable[REG_CAN_NID] == 0xFFFF) ? 0 : DataTable[REG_CAN_NID];
-	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive, NodeID);
 }
 // -----------------------------------------
