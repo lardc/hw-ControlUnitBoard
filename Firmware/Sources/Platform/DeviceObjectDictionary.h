@@ -27,6 +27,11 @@
 #define REG_INVERT_SEN4				5	// Инверсия сигнала с датчика 4
 #define REG_DISABLE_SEN4			6	// Отключение датчика 4
 //
+#define REG_CAN_NID					10	// Переопределение Master NodeID
+#define REG_CAN_BAUDRATE			11	// Переопределение частоты CAN
+										// 0 - 1МБит
+										// 1 - 100кБит
+//
 #define REG_LAMP_1					128	//
 #define REG_LAMP_2					129	//
 #define REG_LAMP_3					130	//

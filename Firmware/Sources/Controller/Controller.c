@@ -33,6 +33,7 @@ volatile Int16U CONTROL_BootLoaderRequest = 0;
 //
 static void CONTROL_FillWPPartDefault();
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError);
+void CONTROL_InitCAN(Int16U BaudRateFlag);
 
 // Functions
 //
@@ -49,6 +50,8 @@ void CONTROL_Init()
 	// Init data table
 	DT_Init(EPROMService, FALSE);
 	DT_SaveFirmwareInfo(DEVICE_CAN_ADDRESS, 0);
+	CONTROL_InitCAN(0);
+
 	// Fill state variables with default values
 	CONTROL_FillWPPartDefault();
 	
@@ -120,3 +123,25 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 	return TRUE;
 }
 // ----------------------------------------
+
+void CONTROL_InitCAN(Int16U BaudRateFlag)
+{
+	Int16U brp = CANA_BRP, tseg1 = CANA_TSEG1, tseg2 = CANA_TSEG2;
+	if(BaudRateFlag == 1)
+	{
+		brp = CANA_BRP_100;
+		tseg1 = CANA_TSEG1_100;
+		tseg2 = CANA_TSEG2_100;
+	}
+
+	// Init CAN
+	ZwCANa_Init(CANA_BR, brp, tseg1, tseg2, CANA_SJW);
+
+	// Register system handler
+	ZwCANa_RegisterSysEventHandler(&CONTROL_NotifyCANFault);
+
+	// Allow interrupts for CAN
+	ZwCANa_InitInterrupts(TRUE);
+	ZwCANa_EnableInterrupts(TRUE);
+}
+// -----------------------------------------

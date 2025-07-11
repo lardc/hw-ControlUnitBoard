@@ -21,7 +21,6 @@
 Boolean InitializeCPU();
 void InitializeTimers();
 void InitializeSCI();
-void InitializeCAN();
 
 // FORWARD ISRs
 // CPU Timer 2 ISR
@@ -34,7 +33,6 @@ void main()
 {
 	InitializeCPU();
 	InitializeTimers();
-	InitializeCAN();
 	InitializeSCI();
 
 	// Инициализация EEPROM, контроллера и GPIO (с учётом настроек в DT)
@@ -118,20 +116,6 @@ void InitializeSCI()
 	ZwSCIb_EnableInterrupts(FALSE, FALSE);
 
 	ZwSCI_EnableInterruptsGlobal(FALSE);
-}
-// -----------------------------------------
-
-void InitializeCAN()
-{
-	// Init CAN
-	ZwCANa_Init(CANA_BR, CANA_BRP, CANA_TSEG1, CANA_TSEG2, CANA_SJW);
-
-	// Register system handler
-	ZwCANa_RegisterSysEventHandler(&CONTROL_NotifyCANFault);
-
-	// Allow interrupts for CAN
-	ZwCANa_InitInterrupts(TRUE);
-	ZwCANa_EnableInterrupts(TRUE);
 }
 // -----------------------------------------
 

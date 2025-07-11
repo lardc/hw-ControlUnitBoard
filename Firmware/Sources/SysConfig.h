@@ -71,6 +71,11 @@
 #define CANA_TSEG1			6
 #define CANA_TSEG2			1
 #define CANA_SJW			1
+
+#define CANA_BR_100			100000L
+#define CANA_BRP_100		124
+#define CANA_TSEG1_100		3
+#define CANA_TSEG2_100		2
 //--------------------------------------------------------
 
 #endif // __SYSCONFIG_H
