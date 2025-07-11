@@ -33,6 +33,8 @@
 										// 0 - 1МБит
 										// 1 - 100кБит
 //
+#define REG_WORKPLACE_FLAG			80	// Используется верхним уровнем на ударном токе
+//
 #define REG_LAMP_1					128	//
 #define REG_LAMP_2					129	//
 #define REG_LAMP_3					130	//

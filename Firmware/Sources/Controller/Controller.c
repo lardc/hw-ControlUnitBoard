@@ -62,6 +62,7 @@ void CONTROL_Init()
 	// Reset control values
 	DEVPROFILE_ResetControlSection();
 	DataTable[REG_MME_CODE] = DataTable[REG_MME_CODE_CONFIG];
+	DataTable[REG_WORKPLACE_FLAG] = 0;
 	
 	if(ZwSystem_GetDogAlarmFlag())
 		ZwSystem_ClearDogAlarmFlag();
