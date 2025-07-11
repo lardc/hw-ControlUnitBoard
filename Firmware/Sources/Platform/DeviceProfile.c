@@ -35,12 +35,13 @@ typedef struct __EPStates
 //
 SCCI_Interface DEVICE_RS232_Interface;
 BCCIM_Interface DEVICE_CAN_Interface;
+BCCI_Interface DEVICE_CAN_InterfaceSlave;
 //
 static SCCI_IOConfig RS232_IOConfig;
 static BCCI_IOConfig CAN_IOConfig;
 static xCCI_ServiceConfig X_ServiceConfig;
 static xCCI_FUNC_CallbackAction ControllerDispatchFunction;
-static EPStates RS232_EPState;
+static EPStates RS232_EPState, CAN_EPState;
 static Boolean UnlockedForNVWrite = FALSE;
 //
 static volatile Boolean *MaskChangesFlag;
@@ -85,16 +86,21 @@ void DEVPROFILE_Init(xCCI_FUNC_CallbackAction SpecializedDispatch, volatile Bool
 	// Init interface driver
 	SCCI_Init(&DEVICE_RS232_Interface, &RS232_IOConfig, &X_ServiceConfig, (pInt16U)DataTable,
 			DATA_TABLE_SIZE, SCCI_TIMEOUT_TICKS, &RS232_EPState);
-	DEVPROFILE_BCCIM_InitWrapper(NodeID);
 	
 	// Set write protection
 	SCCI_AddProtectedArea(&DEVICE_RS232_Interface, DATA_TABLE_WP_START, DATA_TABLE_SIZE - 1);
+
+	DEVPROFILE_BCCIx_InitWrapper(NodeID);
 }
 // ----------------------------------------
 
-void DEVPROFILE_BCCIM_InitWrapper(Int16U NodeID)
+void DEVPROFILE_BCCIx_InitWrapper(Int16U NodeID)
 {
 	BCCIM_Init(&DEVICE_CAN_Interface, &CAN_IOConfig, SCCI_TIMEOUT_TICKS, &CONTROL_TimeCounter, NodeID);
+
+	BCCI_InitWithNodeID(&DEVICE_CAN_InterfaceSlave, &CAN_IOConfig, &X_ServiceConfig, (pInt16U)DataTable,
+			DATA_TABLE_SIZE, &CAN_EPState, NodeID);
+	BCCI_AddProtectedArea(&DEVICE_CAN_InterfaceSlave, DATA_TABLE_WP_START, DATA_TABLE_SIZE - 1);
 }
 // ----------------------------------------
 

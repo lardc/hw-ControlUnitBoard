@@ -34,6 +34,7 @@ volatile Int16U CONTROL_BootLoaderRequest = 0;
 static void CONTROL_FillWPPartDefault();
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError);
 void CONTROL_InitCAN();
+Int16U CONTROL_GetNodeID();
 
 // Functions
 //
@@ -49,16 +50,17 @@ void CONTROL_Init()
 	
 	// Init data table
 	DT_Init(EPROMService, FALSE);
-	DT_SaveFirmwareInfo(DEVICE_CAN_ADDRESS, 0);
 	CONTROL_InitCAN();
 
 	// Fill state variables with default values
 	CONTROL_FillWPPartDefault();
 	
 	// Device profile initialization
-	Int16U NodeID = (DataTable[REG_CAN_NID] == 0xFFFF) ? 0 : DataTable[REG_CAN_NID];
+	Int16U NodeID = CONTROL_GetNodeID();
 	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive, NodeID);
 	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
+	DT_SaveFirmwareInfo(NodeID, NodeID);
+
 	// Reset control values
 	DEVPROFILE_ResetControlSection();
 	DataTable[REG_MME_CODE] = DataTable[REG_MME_CODE_CONFIG];
@@ -73,6 +75,12 @@ void CONTROL_Idle()
 {
 	DEVPROFILE_ProcessRequests();
 	DEVPROFILE_UpdateCANDiagStatus();
+}
+// ----------------------------------------
+
+Int16U CONTROL_GetNodeID()
+{
+	return (DataTable[REG_CAN_NID] == 0xFFFF || DataTable[REG_CAN_NID] == 0) ? DEVICE_CAN_ADDRESS : DataTable[REG_CAN_NID];
 }
 // ----------------------------------------
 
@@ -112,8 +120,9 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			{
 				CONTROL_InitCAN();
 
-				Int16U NodeID = (DataTable[REG_CAN_NID] == 0xFFFF) ? 0 : DataTable[REG_CAN_NID];
-				DEVPROFILE_BCCIM_InitWrapper(NodeID);
+				Int16U NodeID = CONTROL_GetNodeID();
+				DEVPROFILE_BCCIx_InitWrapper(NodeID);
+				DT_SaveFirmwareInfo(NodeID, NodeID);
 			}
 			break;
 
