@@ -8,6 +8,7 @@
 // COMMANDS
 //
 #define ACT_RESET_STATE_MACHINE		10	// Reset state machine to default state
+#define ACT_REINIT_CAN				11	// Повторная конфигурация CAN
 //
 #define ACT_BROADCAST_PING			100	// Отправка широковещательного запроса в CAN сеть
 #define ACT_SAVE_TO_ROM				200	// Save parameters to EEPROM module

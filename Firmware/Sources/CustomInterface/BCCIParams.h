@@ -13,5 +13,7 @@
 #define DEV_ADDR_MPY				(1 << 10)
 #define CAN_ACCEPTANCE_MASK			0x0003FC00
 #define BR_TIMEOUT					100
+#define CAN_MASTER_NID_MASK			0x03FC0000		// Маска Master node ID
+#define CAN_MASTER_NID_MPY			18				// Смещение адреса Master
 
 #endif // __BCCI_PARAMS_H

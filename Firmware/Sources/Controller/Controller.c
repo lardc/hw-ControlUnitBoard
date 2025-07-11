@@ -33,7 +33,8 @@ volatile Int16U CONTROL_BootLoaderRequest = 0;
 //
 static void CONTROL_FillWPPartDefault();
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError);
-void CONTROL_InitCAN(Int16U BaudRateFlag);
+void CONTROL_InitCAN();
+void CONTROL_DeviceProfileInitWrapper();
 
 // Functions
 //
@@ -50,13 +51,13 @@ void CONTROL_Init()
 	// Init data table
 	DT_Init(EPROMService, FALSE);
 	DT_SaveFirmwareInfo(DEVICE_CAN_ADDRESS, 0);
-	CONTROL_InitCAN(0);
+	CONTROL_InitCAN();
 
 	// Fill state variables with default values
 	CONTROL_FillWPPartDefault();
 	
 	// Device profile initialization
-	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive);
+	CONTROL_DeviceProfileInitWrapper();
 	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
 	// Reset control values
 	DEVPROFILE_ResetControlSection();
@@ -106,6 +107,11 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			SM_Reset();
 			break;
 
+		case ACT_REINIT_CAN:
+			CONTROL_InitCAN();
+			CONTROL_DeviceProfileInitWrapper();
+			break;
+
 		case ACT_BOOT_LOADER_REQUEST:
 			CONTROL_BootLoaderRequest = BOOT_LOADER_REQUEST;
 			break;
@@ -124,10 +130,10 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 }
 // ----------------------------------------
 
-void CONTROL_InitCAN(Int16U BaudRateFlag)
+void CONTROL_InitCAN()
 {
 	Int16U brp = CANA_BRP, tseg1 = CANA_TSEG1, tseg2 = CANA_TSEG2;
-	if(BaudRateFlag == 1)
+	if(DataTable[REG_CAN_BAUDRATE] == 1)
 	{
 		brp = CANA_BRP_100;
 		tseg1 = CANA_TSEG1_100;
@@ -143,5 +149,12 @@ void CONTROL_InitCAN(Int16U BaudRateFlag)
 	// Allow interrupts for CAN
 	ZwCANa_InitInterrupts(TRUE);
 	ZwCANa_EnableInterrupts(TRUE);
+}
+// -----------------------------------------
+
+void CONTROL_DeviceProfileInitWrapper()
+{
+	Int16U NodeID = (DataTable[REG_CAN_NID] == 0xFFFF) ? 0 : DataTable[REG_CAN_NID];
+	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive, NodeID);
 }
 // -----------------------------------------
