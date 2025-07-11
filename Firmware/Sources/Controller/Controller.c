@@ -57,9 +57,12 @@ void CONTROL_Init()
 	
 	// Device profile initialization
 	Int16U NodeID = CONTROL_GetNodeID();
-	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive, NodeID);
+	// Патч для работы с таблеточным ЗУ на ударном токе
+	Int16U MasterNID = (NodeID == 1) ? 0 : NodeID;
+
+	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive, NodeID, MasterNID);
 	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
-	DT_SaveFirmwareInfo(NodeID, NodeID);
+	DT_SaveFirmwareInfo(NodeID, MasterNID);
 
 	// Reset control values
 	DEVPROFILE_ResetControlSection();
@@ -121,8 +124,11 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				CONTROL_InitCAN();
 
 				Int16U NodeID = CONTROL_GetNodeID();
-				DEVPROFILE_BCCIx_InitWrapper(NodeID);
-				DT_SaveFirmwareInfo(NodeID, NodeID);
+				// Патч для работы с таблеточным ЗУ на ударном токе
+				Int16U MasterNID = (NodeID == 1) ? 0 : NodeID;
+
+				DEVPROFILE_BCCIx_InitWrapper(NodeID, MasterNID);
+				DT_SaveFirmwareInfo(NodeID, MasterNID);
 			}
 			break;
 

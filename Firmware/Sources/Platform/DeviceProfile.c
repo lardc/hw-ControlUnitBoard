@@ -58,7 +58,8 @@ static Int16U DEVPROFILE_CallbackReadX(Int16U Endpoint, pInt16U *Buffer, Boolean
 
 // Functions
 //
-void DEVPROFILE_Init(xCCI_FUNC_CallbackAction SpecializedDispatch, volatile Boolean *MaskChanges, Int16U NodeID)
+void DEVPROFILE_Init(xCCI_FUNC_CallbackAction SpecializedDispatch, volatile Boolean *MaskChanges, Int16U NodeID,
+		Int16U MasterNID)
 {
 	// Save values
 	ControllerDispatchFunction = SpecializedDispatch;
@@ -90,13 +91,13 @@ void DEVPROFILE_Init(xCCI_FUNC_CallbackAction SpecializedDispatch, volatile Bool
 	// Set write protection
 	SCCI_AddProtectedArea(&DEVICE_RS232_Interface, DATA_TABLE_WP_START, DATA_TABLE_SIZE - 1);
 
-	DEVPROFILE_BCCIx_InitWrapper(NodeID);
+	DEVPROFILE_BCCIx_InitWrapper(NodeID, MasterNID);
 }
 // ----------------------------------------
 
-void DEVPROFILE_BCCIx_InitWrapper(Int16U NodeID)
+void DEVPROFILE_BCCIx_InitWrapper(Int16U NodeID, Int16U MasterNID)
 {
-	BCCIM_Init(&DEVICE_CAN_Interface, &CAN_IOConfig, SCCI_TIMEOUT_TICKS, &CONTROL_TimeCounter, NodeID);
+	BCCIM_Init(&DEVICE_CAN_Interface, &CAN_IOConfig, SCCI_TIMEOUT_TICKS, &CONTROL_TimeCounter, MasterNID);
 
 	BCCI_InitWithNodeID(&DEVICE_CAN_InterfaceSlave, &CAN_IOConfig, &X_ServiceConfig, (pInt16U)DataTable,
 			DATA_TABLE_SIZE, &CAN_EPState, NodeID);
