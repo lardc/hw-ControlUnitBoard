@@ -122,8 +122,8 @@ void DEVPROFILE_InitEPService(pInt16U Indexes, pInt16U Sizes, pInt16U *Counters,
 // ----------------------------------------
 void DEVPROFILE_ProcessRequests()
 {
-	// Handle interface requests
 	SCCI_Process(&DEVICE_RS232_Interface, CONTROL_TimeCounter, *MaskChangesFlag);
+	BCCI_Process(&DEVICE_CAN_InterfaceSlave, *MaskChangesFlag);
 }
 // ----------------------------------------
 
