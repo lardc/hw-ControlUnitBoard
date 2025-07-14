@@ -422,7 +422,7 @@ void BCCIM_SendBroadcastPing(pBCCIM_Interface Interface, pInt16U NodeArray, pInt
 static void BCCIM_SendFrame(pBCCIM_Interface Interface, Int16U Mailbox, pCANMessage Message, Int32U Node,
 		Int16U Command)
 {
-	Int32U ShiftedSlaveNodeID = ((Int32U)NodeID * CAN_SLAVE_NID_MPY) & CAN_SLAVE_NID_MASK;
+	Int32U ShiftedSlaveNodeID = ((Int32U)Node * CAN_SLAVE_NID_MPY) & CAN_SLAVE_NID_MASK;
 	Message->MsgID.all = MasterShiftedNodeID | ShiftedSlaveNodeID | Command;
 	Interface->IOConfig->IO_SendMessageEx(Mailbox, Message, TRUE, FALSE);
 }
