@@ -86,6 +86,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/hw-TMS-libs/Interface/BCCITypes.h</locationURI>
 		</link>
 		<link>
+			<name>Sources/Interface/BCCIxParams.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-TMS-libs/Interface/BCCIxParams.h</locationURI>
+		</link>
+		<link>
 			<name>Sources/Interface/CRC16.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/hw-TMS-libs/Interface/CRC16.c</locationURI>

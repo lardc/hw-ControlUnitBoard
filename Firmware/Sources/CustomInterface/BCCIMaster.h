@@ -10,6 +10,7 @@
 //
 #include "BCCITypes.h"
 #include "SCCI.h"
+#include "BCCIxParams.h"
 
 // Variables
 extern Int16U	BCCIM_ReadBlock16Buffer[];
