@@ -79,7 +79,7 @@ static Int32U MasterShiftedNodeID = 0;
 //
 void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig, Int32U MessageTimeoutTicks, volatile Int64U *pTimer, Int16U NodeID)
 {
-	MasterShiftedNodeID = CAN_MASTER_NID_MPY * NodeID;
+	MasterShiftedNodeID = (CAN_MASTER_NID_MPY * NodeID) & CAN_MASTER_NID_MASK;
 
 	// Save parameters
 	Interface->IOConfig = IOConfig;
