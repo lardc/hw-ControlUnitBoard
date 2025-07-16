@@ -283,9 +283,11 @@ Int16U BCCIM_ReadBlock16(pBCCIM_Interface Interface, Int16U Node, Int16U Endpoin
 	while(*(Interface->pTimerCounter) < timeout)
 	{
 		// Get response
-		if ((ret = BCCIM_WaitResponse(Interface, MBOX_RB_16_A)) == ERR_NO_ERROR)
+		if((ret = BCCIM_WaitResponse(Interface, MBOX_RB_16_A)) == ERR_NO_ERROR)
 		{
-			if (BCCIM_HandleReadBlock16(Interface))
+			// При поступлении пакетов ответа  обновляется счётчик таймаута
+			timeout = Interface->TimeoutValueTicks + *(Interface->pTimerCounter);
+			if(BCCIM_HandleReadBlock16(Interface))
 				return ERR_NO_ERROR;
 		}
 		else
