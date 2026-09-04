@@ -92,6 +92,11 @@ static void SCCI_HandleCall(pSCCI_Interface Interface);
 // Variables
 //
 static Int16U ZeroBuffer[xCCI_BUFFER_SIZE] = {0};
+#ifdef USE_FLOAT_DT
+	const Boolean FloatDT = TRUE;
+#else
+	const Boolean FloatDT = FALSE;
+#endif
 
 // Functions
 //
@@ -680,7 +685,9 @@ static void SCCI_HandleReadFloat(pSCCI_Interface Interface)
 
 	if(node == DEVICE_SCCI_ADDRESS)
 	{
-		if((addr + 1) >= Interface->DataTableSize)
+		if(!FloatDT)
+			SCCI_SendErrorFrame(Interface, ERR_NOT_SUPPORTED, addr);
+		else if((addr + 1) >= Interface->DataTableSize)
 		{
 			SCCI_SendErrorFrame(Interface, ERR_INVALID_ADDESS, addr + 1);
 		}
@@ -795,7 +802,9 @@ static void SCCI_HandleWriteFloat(pSCCI_Interface Interface)
 
 	if(node == DEVICE_SCCI_ADDRESS)
 	{
-		if((addr + 1) >= Interface->DataTableSize)
+		if(!FloatDT)
+			SCCI_SendErrorFrame(Interface, ERR_NOT_SUPPORTED, addr);
+		else if((addr + 1) >= Interface->DataTableSize)
 		{
 			SCCI_SendErrorFrame(Interface, ERR_INVALID_ADDESS, addr + 1);
 		}
@@ -1013,7 +1022,37 @@ void SCCI_HandleReadBlockFastFloat(pSCCI_Interface Interface)
 	Int16U node = Interface->MessageBuffer[0] & 0xFF;
 	Int16U epnt = Interface->MessageBuffer[2] >> 8;
 
-	if(node != DEVICE_SCCI_ADDRESS)
+	if(node == DEVICE_SCCI_ADDRESS)
+	{
+		if(!FloatDT)
+			SCCI_SendErrorFrame(Interface, ERR_NOT_SUPPORTED, epnt);
+		else if((epnt < xCCI_MAX_READ_ENDPOINTS) && Interface->ProtectionAndEndpoints.ReadEndpoints32[epnt])
+		{
+			pInt32U src;
+			Int16U length = Interface->ProtectionAndEndpoints.ReadEndpoints32[epnt](epnt, &src, TRUE, FALSE,
+					Interface->ArgForEPCallback, 0);
+
+			Interface->MessageBuffer[2] = (epnt << 8) | (SCCI_USE_CRC_IN_STREAM ? 1 : 0);
+
+			length *= 2;
+			pInt16U short_src = (pInt16U)src;
+
+			if(length > xCCI_BLOCK_STM_MAX_VAL)
+				length = 0;
+			Interface->MessageBuffer[3] = length;
+
+			if(SCCI_USE_CRC_IN_STREAM)
+				Interface->MessageBuffer[4] = CRC16_ComputeCRC(short_src, length);
+
+			SCCI_SendResponseFrame(Interface, 6);
+
+			Interface->IOConfig->IO_SendArray16(short_src, length);
+			Interface->IOConfig->IO_SendArray16((pInt16U)ZeroBuffer, (8 - length % 8) % 8);
+		}
+		else
+			SCCI_SendErrorFrame(Interface, ERR_INVALID_ENDPOINT, epnt);
+	}
+	else
 	{
 		Int16U err = BCCIM_ReadBlockFloat(&DEVICE_CAN_Interface, node, epnt);
 
