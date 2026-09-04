@@ -1033,12 +1033,13 @@ void SCCI_HandleReadBlockFastFloat(pSCCI_Interface Interface)
 					Interface->ArgForEPCallback, 0);
 
 			Interface->MessageBuffer[2] = (epnt << 8) | (SCCI_USE_CRC_IN_STREAM ? 1 : 0);
-
-			length *= 2;
 			pInt16U short_src = (pInt16U)src;
 
-			if(length > xCCI_BLOCK_STM_MAX_VAL)
+			if(length > xCCI_BLOCK_STM_MAX_VAL / 2)
 				length = 0;
+			else
+				length *= 2;
+
 			Interface->MessageBuffer[3] = length;
 
 			if(SCCI_USE_CRC_IN_STREAM)
